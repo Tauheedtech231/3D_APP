@@ -1,12 +1,11 @@
 // app/student/settings/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { 
   Check, 
   Palette, 
   Moon, 
-  Sun, 
   Save,
   RotateCcw,
   PaintBucket,
@@ -16,47 +15,47 @@ import {
 // Define all available themes
 const themes = [
   { 
-    id: "default-light", 
-    name: "Light", 
-    icon: <Sun size={16} />,
+    id: "default-green", 
+    name: "Green", 
+    icon: <PaintBucket size={16} />,
     colors: {
-      '--primary': '#3b82f6',
+      '--primary': '#10b981',
       '--primary-foreground': '#ffffff',
-      '--secondary': '#f3f4f6',
-      '--secondary-foreground': '#111827',
-      '--accent': '#4f46e5',
+      '--secondary': '#d1fae5',
+      '--secondary-foreground': '#064e3b',
+      '--accent': '#059669',
       '--accent-foreground': '#ffffff',
-      '--background': '#ffffff',
-      '--foreground': '#111827',
-      '--muted': '#f9fafb',
-      '--muted-foreground': '#6b7280',
+      '--background': '#ecfdf5',
+      '--foreground': '#064e3b',
+      '--muted': '#a7f3d0',
+      '--muted-foreground': '#065f46',
       '--card': '#ffffff',
-      '--card-foreground': '#111827',
-      '--border': '#e5e7eb',
-      '--input': '#e5e7eb',
-      '--ring': '#3b82f6'
+      '--card-foreground': '#064e3b',
+      '--border': '#a7f3d0',
+      '--input': '#a7f3d0',
+      '--ring': '#10b981'
     }
   },
   { 
-    id: "default-dark", 
+    id: "dark", 
     name: "Dark", 
     icon: <Moon size={16} />,
     colors: {
-      '--primary': '#3b82f6',
+      '--primary': '#10b981',
       '--primary-foreground': '#ffffff',
       '--secondary': '#1f2937',
       '--secondary-foreground': '#f9fafb',
-      '--accent': '#6366f1',
+      '--accent': '#059669',
       '--accent-foreground': '#ffffff',
       '--background': '#111827',
       '--foreground': '#f9fafb',
-      '--muted': '#1f2937',
+      '--muted': '#374151',
       '--muted-foreground': '#9ca3af',
       '--card': '#1f2937',
       '--card-foreground': '#f9fafb',
       '--border': '#374151',
       '--input': '#374151',
-      '--ring': '#3b82f6'
+      '--ring': '#10b981'
     }
   },
   { 
@@ -134,25 +133,23 @@ const themes = [
 ];
 
 export default function SettingsPage() {
-  const [currentTheme, setCurrentTheme] = useState<string>("default-light");
+  const [currentTheme, setCurrentTheme] = useState<string>("default-green");
+  const [fontSize, setFontSize] = useState<string>("medium");
   const [isMounted, setIsMounted] = useState(false);
+  const [customColors, setCustomColors] = useState({
+    background: '#ffffff',
+    text: '#000000'
+  });
 
-  useEffect(() => {
-    setIsMounted(true);
-    const savedTheme = localStorage.getItem("theme") || "default-light";
-    setCurrentTheme(savedTheme);
-    applyTheme(savedTheme);
-  }, []);
-
-  const applyTheme = (themeId: string) => {
+  const applyTheme = useCallback((themeId: string) => {
     const theme = themes.find(t => t.id === themeId);
     
     if (themeId === "system") {
       // Handle system theme
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        applyTheme("default-dark");
+        applyTheme("dark");
       } else {
-        applyTheme("default-light");
+        applyTheme("default-green");
       }
       return;
     }
@@ -169,7 +166,23 @@ export default function SettingsPage() {
       // Add theme class for CSS specificity
       document.documentElement.classList.add(`theme-${themeId}`);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const savedTheme = localStorage.getItem("theme") || "default-green";
+    const savedFontSize = localStorage.getItem("fontSize") || "medium";
+    const savedCustomColors = JSON.parse(localStorage.getItem("customColors") || JSON.stringify({
+      background: '#ffffff',
+      text: '#000000'
+    }));
+    setCurrentTheme(savedTheme);
+    setFontSize(savedFontSize);
+    setCustomColors(savedCustomColors);
+    applyTheme(savedTheme);
+    applyFontSize(savedFontSize);
+    applyCustomColors(savedCustomColors);
+  }, [applyTheme]);
 
   const handleThemeChange = (themeId: string) => {
     setCurrentTheme(themeId);
@@ -177,11 +190,43 @@ export default function SettingsPage() {
     applyTheme(themeId);
   };
 
+  const applyFontSize = (size: string) => {
+    document.documentElement.style.setProperty('--base-font-size', 
+      size === 'small' ? '14px' : size === 'large' ? '18px' : '16px'
+    );
+  };
+
+  const handleFontSizeChange = (size: string) => {
+    setFontSize(size);
+    localStorage.setItem("fontSize", size);
+    applyFontSize(size);
+  };
+
+  const applyCustomColors = (colors: { background: string; text: string }) => {
+    document.documentElement.style.setProperty('--custom-background', colors.background);
+    document.documentElement.style.setProperty('--custom-text', colors.text);
+  };
+
+  const handleCustomColorChange = (type: 'background' | 'text', color: string) => {
+    const newColors = { ...customColors, [type]: color };
+    setCustomColors(newColors);
+    localStorage.setItem("customColors", JSON.stringify(newColors));
+    applyCustomColors(newColors);
+  };
+
   const handleResetSettings = () => {
     if (confirm("Are you sure you want to reset to default settings?")) {
       localStorage.removeItem("theme");
-      setCurrentTheme("default-light");
-      applyTheme("default-light");
+      localStorage.removeItem("fontSize");
+      localStorage.removeItem("customColors");
+      setCurrentTheme("default-green");
+      setCustomColors({
+        background: '#ffffff',
+        text: '#000000'
+      });
+      setFontSize("medium");
+      applyTheme("default-green");
+      applyFontSize("medium");
     }
   };
 
@@ -285,6 +330,71 @@ export default function SettingsPage() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="mt-8 bg-card p-6 rounded-xl shadow-sm border">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span className="text-lg">Aa</span>
+            Font Size
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Adjust the text size across all pages.
+          </p>
+          
+          <div className="flex gap-4 mb-8">
+            <button
+              onClick={() => handleFontSizeChange('small')}
+              className={`px-4 py-2 rounded-lg transition-all ${fontSize === 'small' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-secondary hover:bg-secondary/80'}`}
+            >
+              Small
+            </button>
+            <button
+              onClick={() => handleFontSizeChange('medium')}
+              className={`px-4 py-2 rounded-lg transition-all ${fontSize === 'medium' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-secondary hover:bg-secondary/80'}`}
+            >
+              Medium
+            </button>
+            <button
+              onClick={() => handleFontSizeChange('large')}
+              className={`px-4 py-2 rounded-lg transition-all ${fontSize === 'large' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-secondary hover:bg-secondary/80'}`}
+            >
+              Large
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-8 bg-card p-6 rounded-xl shadow-sm border">
+          <h2 className="text-xl font-semibold mb-4">Custom Colors</h2>
+          <p className="text-muted-foreground mb-6">
+            Customize specific colors for your interface
+          </p>
+          
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <label className="min-w-[100px]">Background:</label>
+              <input
+                type="color"
+                value={customColors.background}
+                onChange={(e) => handleCustomColorChange('background', e.target.value)}
+                className="h-10 w-20 cursor-pointer rounded border p-1"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="min-w-[100px]">Text Color:</label>
+              <input
+                type="color"
+                value={customColors.text}
+                onChange={(e) => handleCustomColorChange('text', e.target.value)}
+                className="h-10 w-20 cursor-pointer rounded border p-1"
+              />
+            </div>
           </div>
         </div>
 

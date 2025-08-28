@@ -1,6 +1,9 @@
 "use client";
+/* eslint-disable */
 
-import { useState } from "react";
+
+
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,58 +18,74 @@ interface Submission {
   studentEmail: string;
   studentAvatar: string;
   submittedOn: string;
-  status: "pending" | "graded";
+  status: "pending" | "Graded";
   grade?: number;
+  points_earned?: number;
   feedback?: string;
   attachmentUrl?: string;
+  courseTitle?:string;
+  submissionText?:string
 }
 
 export default function AssignmentGrading() {
   const params = useParams();
   const assignmentId = params.id as string;
   
-  // Mock assignment data - in a real app, this would be fetched from an API
-  const [assignment, setAssignment] = useState({
-    id: assignmentId,
-    title: assignmentId === "1" ? "Web Development Fundamentals" : 
-           assignmentId === "2" ? "JavaScript Basics Quiz" : "Database Design Project",
-    course: assignmentId === "1" ? "Introduction to HTML & CSS" : 
-            assignmentId === "2" ? "Programming Fundamentals" : "Database Management",
-    dueDate: "2023-08-15",
-    totalPoints: 100,
-    description: "Create a simple webpage using HTML and CSS that includes a header, navigation menu, main content area, and footer. The page should be responsive and follow best practices for semantic HTML.",
-    submissions: [
-      {
-        id: "sub1",
-        studentName: "Ahmed Khan",
-        studentEmail: "ahmed@example.com",
-        studentAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-        submittedOn: "2023-08-10T14:30:00",
-        status: "pending",
-        attachmentUrl: "/submissions/ahmed-html-assignment.zip"
-      },
-      {
-        id: "sub2",
-        studentName: "Fatima Ali",
-        studentEmail: "fatima@example.com",
-        studentAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-        submittedOn: "2023-08-09T10:15:00",
-        status: "graded",
-        grade: 92,
-        feedback: "Excellent work! Your HTML structure is clean and semantic. The CSS styling is well-organized and your responsive design works perfectly across different screen sizes. Keep up the great work!",
-        attachmentUrl: "/submissions/fatima-html-assignment.zip"
-      },
-      {
-        id: "sub3",
-        studentName: "Usman Malik",
-        studentEmail: "usman@example.com",
-        studentAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-        submittedOn: "2023-08-11T09:45:00",
-        status: "pending",
-        attachmentUrl: "/submissions/usman-html-assignment.zip"
-      },
-    ] as Submission[]
-  });
+  const [assignment, setAssignment] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAssignmentData();
+  }, [assignmentId]);
+
+const fetchAssignmentData = async () => {
+  try {
+    setLoading(true);
+    const response = await fetch(`http://localhost:5000/api/assignments/${assignmentId}`);
+    console.log("the res",response)
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Raw API response:", data);
+
+      // Map submissions for table
+      const mappedData = data.submissions.map((submission: any) => {
+        const assignmentGrade = submission.assignment_grades?.[0];
+        console.log("Assignment grade for submission:", assignmentGrade);
+        
+        return {
+          id: submission.id,
+          studentName: submission.students?.name || "",
+          studentEmail: submission.students?.email || "",
+          studentAvatar: submission.students?.image || "",
+          submittedOn: submission.submitted_at || "",
+          status: submission.status || "Pending",
+          grade: assignmentGrade?.points_earned,
+          points_earned: assignmentGrade?.points_earned,
+          feedback: assignmentGrade?.feedback || "",
+          attachmentUrl: submission.file_url || "",
+          submissionText: submission.submission_text || "",
+          courseTitle: data.courses?.title || "",
+          title: data.title || "",
+          description: data.description || "",
+          instructions: data.instructions || "",
+          total_points: data.total_points || 100,
+          due_date: data.due_date || ""
+        };
+      });
+
+      console.log("Mapped submission data:", mappedData);
+      setAssignment(mappedData);
+    } else {
+      console.error('Failed to fetch assignment data');
+    }
+  } catch (error) {
+    console.error('Error fetching assignment data:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [gradeInput, setGradeInput] = useState<string>("");
@@ -84,48 +103,106 @@ export default function AssignmentGrading() {
 
   const handleSelectSubmission = (submission: Submission) => {
     setSelectedSubmission(submission);
-    setGradeInput(submission.grade?.toString() || "");
+    setGradeInput(submission.points_earned?.toString() || "");
     setFeedbackInput(submission.feedback || "");
   };
 
-  const handleSubmitGrade = () => {
+  const handleSubmitGrade = async () => {
     if (!selectedSubmission) return;
     
     const grade = parseInt(gradeInput);
-    if (isNaN(grade) || grade < 0 || grade > assignment.totalPoints) {
-      alert(`Please enter a valid grade between 0 and ${assignment.totalPoints}`);
+    if (isNaN(grade) || grade < 0 || grade > assignment.
+total_points
+) {
+      alert(`Please enter a valid grade between 0 and ${assignment.
+total_points
+}`);
       return;
     }
     
     // Update the submission in our state
-    const updatedSubmissions = assignment.submissions.map(sub => {
-      if (sub.id === selectedSubmission.id) {
-        return {
-          ...sub,
-          status: "graded" as const,
-          grade,
-          feedback: feedbackInput
-        };
-      }
-      return sub;
-    });
     
-    setAssignment({
-      ...assignment,
-      submissions: updatedSubmissions
-    });
+    // const updatedSubmissions = assignment.map(sub => {
+    //   if (sub.id === selectedSubmission.id) {
+    //     return {
+    //       ...sub,
+    //       status: "Graded",
+    //       points_earned: grade,
+    //       feedback: feedbackInput
+    //     };
+    //   }
+    //   return sub;
+    // });
+    const updatedSubmissions: Submission[] = assignment.map((sub: Submission) => {
+  if (sub.id === selectedSubmission.id) {
+    return {
+      ...sub,
+      status: "Graded",
+      points_earned: grade,
+      feedback: feedbackInput
+    };
+  }
+  return sub;
+});
+
+    
+    setAssignment(updatedSubmissions);
     
     // Update the selected submission
     setSelectedSubmission({
       ...selectedSubmission,
-      status: "graded",
-      grade,
+      status: "Graded",
+      points_earned: grade,
       feedback: feedbackInput
     });
     
-    // In a real app, this would send the grade and feedback to an API
-    alert(`Grade and feedback submitted for ${selectedSubmission.studentName}`);
+    // Send grade and feedback to API
+    try {
+      const response = await fetch(`http://localhost:5000/api/assignments/${assignmentId}/grade`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          submissionId: selectedSubmission.id,
+          grade,
+          feedback: feedbackInput,
+          instructor_id:1
+
+        })
+      });
+      
+      if (response.ok) {
+        alert(`Grade and feedback submitted for ${selectedSubmission.studentName}`);
+      } else {
+        alert('Failed to submit grade');
+      }
+    } catch (error) {
+      console.error('Error submitting grade:', error);
+      alert('Error submitting grade');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-8 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen p-6 transition-colors">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="text-center mt-4">Loading assignment data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!assignment) {
+    return (
+      <div className="space-y-8 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen p-6 transition-colors">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+          <p className="text-center">Assignment not found</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen p-6 transition-colors">
@@ -133,22 +210,23 @@ export default function AssignmentGrading() {
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">{assignment.title}</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Course: {assignment.course}</p>
+            <h1 className="text-2xl font-bold">{assignment[0]?.courseTitle}</h1>
+            <h2 className="text-xl mt-2">{assignment[0]?.title}</h2>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full">
-              <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
+              <span>Due: {formatDate(assignment[0]?.due_date)}</span>
             </div>
             <div className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full">
-              <span>{assignment.submissions.length} Submissions</span>
+              <span>{assignment?.length || 0} Submissions</span>
             </div>
           </div>
         </div>
         
         <div className="mt-4">
           <h2 className="text-lg font-medium mb-2">Assignment Description</h2>
-          <p className="text-gray-700 dark:text-gray-300">{assignment.description}</p>
+          <p className="text-gray-700 dark:text-gray-300">{assignment[0]?.description}</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{assignment[0]?.instructions}</p>
         </div>
       </div>
 
@@ -162,34 +240,32 @@ export default function AssignmentGrading() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {assignment.submissions.map((submission) => (
+                {assignment && assignment.length > 0 ? assignment.map((submission:any) => (
                   <div 
                     key={submission.id} 
                     className={`p-4 rounded-lg border cursor-pointer transition-colors ${selectedSubmission?.id === submission.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                     onClick={() => handleSelectSubmission(submission)}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full overflow-hidden">
-                        <img src={submission.studentAvatar} alt={submission.studentName} className="h-full w-full object-cover" />
-                      </div>
                       <div className="flex-1">
-                        <div className="flex justify-between">
-                          <h3 className="font-medium">{submission.studentName}</h3>
-                          <span className={`text-xs px-2 py-1 rounded-full ${submission.status === 'graded' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'}`}>
-                            {submission.status === 'graded' ? 'Graded' : 'Pending'}
+                        <div className="flex justify-between items-center">
+                          <p className="font-medium">{submission.studentName}</p>
+                          <span className={`text-xs px-2 py-1 rounded-full ${submission.status === 'Graded' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'}`}>
+                            {submission.status === 'Graded' ? `${submission.points_earned}/${assignment[0].total_points}` : 'Pending'}
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400">{submission.studentEmail}</p>
                         <div className="flex justify-between mt-2">
                           <span className="text-xs text-gray-500 dark:text-gray-400">Submitted: {formatDate(submission.submittedOn)}</span>
-                          {submission.status === 'graded' && (
-                            <span className="text-xs font-medium">{submission.grade}/{assignment.totalPoints}</span>
-                          )}
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 dark:text-gray-400">No submissions found</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -205,34 +281,38 @@ export default function AssignmentGrading() {
                     <CardTitle>Grading: {selectedSubmission.studentName}</CardTitle>
                     <CardDescription>Submitted on {formatDate(selectedSubmission.submittedOn)}</CardDescription>
                   </div>
-                  {selectedSubmission.attachmentUrl && (
-                    <Button variant="outline" size="sm" className="flex items-center gap-1">
-                      <Download className="h-4 w-4" />
-                      <span>Download</span>
-                    </Button>
-                  )}
+                {selectedSubmission.attachmentUrl && (
+  <Button variant="outline" size="sm" className="flex items-center gap-1" asChild>
+    <a
+      href={`http://localhost:5000${selectedSubmission.attachmentUrl}`}
+      download
+    >
+      <Download className="h-4 w-4" />
+      <span>Download</span>
+    </a>
+  </Button>
+)}
+
+
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {/* Submission Preview (placeholder) */}
-                  <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 h-64 flex items-center justify-center">
-                    <div className="text-center">
-                      <FileText className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" />
-                      <p className="mt-2 text-gray-500 dark:text-gray-400">Submission preview would appear here</p>
-                      <p className="text-sm text-gray-400 dark:text-gray-500">Download the submission to view full content</p>
-                    </div>
+                  {/* Submission Text */}
+                  <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <h3 className="font-medium mb-2">Submission Text</h3>
+                    <p className="text-gray-700 dark:text-gray-300">{selectedSubmission.submissionText}</p>
                   </div>
 
                   {/* Grading Form */}
                   <div className="grid gap-6">
                     <div className="grid gap-2">
-                      <Label htmlFor="grade">Grade (out of {assignment.totalPoints})</Label>
+                      <Label htmlFor="grade">Grade (out of {assignment[0].total_points})</Label>
                       <Input 
                         id="grade" 
                         type="number" 
                         min="0" 
-                        max={assignment.totalPoints} 
+                        max={assignment[0].total_points} 
                         placeholder="Enter grade" 
                         value={gradeInput}
                         onChange={(e) => setGradeInput(e.target.value)}

@@ -8,7 +8,7 @@ interface InstructorProfileProps {
 
 const InstructorProfile: React.FC<InstructorProfileProps> = ({ instructor, courses }) => {
   const instructorCourses = courses.filter((course) =>
-    instructor.courses.includes(course.id)
+    instructor.courses?.some(c => c.id === course.id) || false
   );
 
   return (
@@ -29,7 +29,7 @@ const InstructorProfile: React.FC<InstructorProfileProps> = ({ instructor, cours
           <p className="text-sm text-gray-500 dark:text-gray-400">{instructor.email}</p>
           <div className="mt-3">
             <span className="px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-md">
-              {instructor.courses.length} Courses
+              {instructor.courses?.length || 0} Courses
             </span>
           </div>
         </div>

@@ -1,18 +1,38 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Menu as MenuIcon, X,  Sun, Moon } from "lucide-react";
+import { Menu as MenuIcon, X, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { useAppSelector, useAppDispatch } from "@/hooks/redux";
+import { logout } from "@/features/auth/authSlice";
+import Link from "next/link";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
 
   useEffect(() => setMounted(true), []);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem("token");
+    router.push("/");
+  };
+
+  const handleAuthAction = (action: "login" | "register") => {
+    if (action === "login") {
+      router.push("/auth/sign-in");
+    } else {
+      router.push("/auth/sign-up");
+    }
+  };
 
   const links = [
     { name: "Home", href: "/" },
@@ -51,29 +71,22 @@ const Navbar = () => {
       } shadow-md`}
     >
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-        {/* Logo */}
-     {/* Logo */}
-{/* Logo */}
-{/* Logo */}
-<div
-  className={`flex items-center gap-2 p-2 rounded-full ${
-    theme === "dark"
-      ? "bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600" // dark mode: attractive blue gradient
-      : "bg-white" // light mode: white background
-  }`}
->
-  <Image
-    src="/main-logo.png"
-    alt="Logo"
-    width={100}
-    height={100}
-    className="object-contain"
-  />
-</div>
+        <div
+          className={`flex items-center gap-2 p-2 rounded-full ${
+            theme === "dark"
+              ? "bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600"
+              : "bg-white"
+          }`}
+        >
+          <Image
+            src="/main-logo.png"
+            alt="Logo"
+            width={100}
+            height={100}
+            className="object-contain"
+          />
+        </div>
 
-
-
-        {/* Desktop Links */}
         <ul className={`hidden md:flex items-center gap-6 font-medium ${linkFontClass}`}>
           {links.map((link) =>
             link.subLinks ? (
@@ -96,13 +109,13 @@ const Navbar = () => {
                 <ul className="absolute left-0 mt-2 w-56 rounded-md shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transform -translate-y-2 group-hover:translate-y-0 transition-all duration-200 z-50 border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
                   {link.subLinks.map((sub) => (
                     <li key={sub.name}>
-                      <a
+                      <Link
                         href={sub.href}
                         className="block px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 rounded text-sm flex items-center"
                       >
                         <span className="w-1.5 h-1.5 bg-blue-200 rounded-full mr-3"></span>
                         {sub.name}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -112,15 +125,13 @@ const Navbar = () => {
                 key={link.name}
                 className="hover:text-blue-600 cursor-pointer transition-colors"
               >
-                <a href={link.href}>{link.name}</a>
+                <Link href={link.href}>{link.name}</Link>
               </li>
             )
           )}
         </ul>
 
-        {/* Right Buttons */}
         <div className="hidden md:flex items-center gap-3">
-          {/* Dark/Light Toggle */}
           <Button
             variant="outline"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -129,26 +140,44 @@ const Navbar = () => {
             {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </Button>
 
-          <Button
-            variant="outline"
-            className={`rounded-full px-4 py-1 ${
-              theme === "dark" ? "text-white border-gray-600" : "text-gray-700"
-            }`}
-          >
-            Login
-          </Button>
-          <Button
-            className={`rounded-full px-4 py-1 ${
-              theme === "dark"
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-          >
-            Register
-          </Button>
+          {user ? (
+            <>
+              <Button
+                variant="outline"
+                onClick={handleLogout}
+                className={`rounded-full px-4 py-1 ${
+                  theme === "dark" ? "text-white border-gray-600" : "text-gray-700"
+                }`}
+              >
+                Logout
+              </Button>
+              <span className="text-sm font-medium">{user.name}</span>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => handleAuthAction("login")}
+                className={`rounded-full px-4 py-1 ${
+                  theme === "dark" ? "text-white border-gray-600" : "text-gray-700"
+                }`}
+              >
+                Login
+              </Button>
+              <Button
+                onClick={() => handleAuthAction("register")}
+                className={`rounded-full px-4 py-1 ${
+                  theme === "dark"
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
+              >
+                Register
+              </Button>
+            </>
+          )}
         </div>
 
-        {/* Mobile Hamburger */}
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -159,10 +188,69 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 shadow-lg border-t border-gray-200 dark:border-gray-700">
-          {/* Mobile menu links can be added here */}
+        <div className="md:hidden bg-white dark:bg-gray-900 shadow-lg border-t border-gray-200 dark:border-gray-700 p-4">
+          <ul className="space-y-4">
+            {links.map((link) =>
+              link.subLinks ? (
+                <li key={link.name} className="space-y-2">
+                  <span className="font-medium">{link.name}</span>
+                  <ul className="pl-4 space-y-2">
+                    {link.subLinks.map((sub) => (
+                      <li key={sub.name}>
+                        <Link
+                          href={sub.href}
+                          className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                        >
+                          {sub.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ) : (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              )
+            )}
+          </ul>
+          
+          <div className="mt-4 space-y-2">
+            {user ? (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                  className="w-full rounded-full"
+                >
+                  Logout
+                </Button>
+                <span className="block text-sm font-medium text-center">{user.name}</span>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => handleAuthAction("login")}
+                  className="w-full rounded-full"
+                >
+                  Login
+                </Button>
+                <Button
+                  onClick={() => handleAuthAction("register")}
+                  className="w-full rounded-full bg-blue-600 hover:bg-blue-700"
+                >
+                  Register
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       )}
     </nav>

@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* Main Content with Sidebar */}
-      <div className="flex flex-1 pt-16"> {/* pt-16 => Navbar ki height jitna gap */}
+      <div className="flex flex-1 pt-16 mt-5"> {/* pt-16 => Navbar ki height jitna gap */}
         {/* Sidebar */}
         <aside className=" shadow-md hidden md:block">
           <Sidebar />

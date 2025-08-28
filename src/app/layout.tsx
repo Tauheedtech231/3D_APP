@@ -4,6 +4,9 @@ import "./globals.css";
 
 // ShadCN Theme Provider
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "sonner";
+import { Providers } from "./providers";
+
 
 
 const geistSans = Geist({
@@ -28,20 +31,22 @@ export default function RootLayout({
 }>) {
   return (
      <>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
         <head />
         <body>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
+          <Providers>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </Providers>
         </body>
       </html>
     </>
-   
   );
 }

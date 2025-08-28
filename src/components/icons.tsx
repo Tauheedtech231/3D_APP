@@ -6,8 +6,8 @@ import {
   MessageSquare,
   Settings,
   Users,
-  LucideIcon,
-  LucideProps
+  CheckSquare,
+  LucideIcon
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -20,4 +20,5 @@ export const Icons = {
   message: MessageSquare,
   settings: Settings,
   chart: BarChart,
+  check: CheckSquare,
 };

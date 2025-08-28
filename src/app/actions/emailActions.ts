@@ -17,10 +17,10 @@ interface InquiryEmailData {
 export async function sendInquiryEmail(data: InquiryEmailData) {
   try {
     // Send confirmation email to the student
-    await sendEmail({
-      to: data.email,
-      subject: `Your Inquiry for ${data.courseTitle} - MANSOL HAB School of Skills`,
-      html: `
+    await sendEmail(
+      data.email,
+      `Your Inquiry for ${data.courseTitle} - MANSOL HAB School of Skills`,
+      `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <div style="text-align: center; margin-bottom: 20px;">
             <h1 style="color: #3b82f6; margin-bottom: 10px;">Thank You for Your Interest!</h1>
@@ -59,13 +59,13 @@ export async function sendInquiryEmail(data: InquiryEmailData) {
           </div>
         </div>
       `
-    });
+    );
 
     // Send notification to admin
-    await sendEmail({
-      to: process.env.ADMIN_EMAIL || 'admin@mansolhab.edu',
-      subject: `New Course Inquiry: ${data.courseTitle}`,
-      html: `
+    await sendEmail(
+      process.env.ADMIN_EMAIL || 'admin@mansolhab.edu',
+      `New Course Inquiry: ${data.courseTitle}`,
+      `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <h1 style="color: #3b82f6; margin-bottom: 20px;">New Course Inquiry</h1>
           
@@ -89,7 +89,7 @@ export async function sendInquiryEmail(data: InquiryEmailData) {
           </div>
         </div>
       `
-    });
+    );
 
     return { success: true };
   } catch (error) {

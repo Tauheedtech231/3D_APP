@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Student } from "../types";
 import Link from "next/link";
-import Image from "next/image";
 
 interface StudentTableProps {
   students: Student[];

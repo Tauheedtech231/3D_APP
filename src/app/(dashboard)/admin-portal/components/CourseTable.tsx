@@ -33,7 +33,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses }) => {
             href="/admin-portal/courses/add_course"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors"
           >
-            + Add Course
+            + Create  Course
           </Link>
         </div>
 
@@ -56,7 +56,8 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses }) => {
                     <p className="text-xs text-blue-500 dark:text-blue-400">{course.description}</p>
                   </div>
                 </td>
-                <td className="px-4 py-2 text-sm">{course.instructor?.name}</td>
+                <td className="px-4 py-2 text-sm">{course.instructor?.name ?? "No instructor"}</td>
+
                 <td className="px-4 py-2 text-xs">
                   <span className="px-2 py-1 font-medium text-blue-700 bg-blue-100 rounded-full dark:bg-blue-700 dark:text-blue-100">
                     {course.enrollmentCount}

@@ -1,17 +1,17 @@
+
 import nodemailer from "nodemailer";
 
 export async function sendEmail(to: string, subject: string, html: string) {
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
+    service: 'gmail',
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   });
 
   await transporter.sendMail({
-    from: `"LMS System" <${process.env.SMTP_USER}>`,
+    from: `"MANSOL LMS" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,

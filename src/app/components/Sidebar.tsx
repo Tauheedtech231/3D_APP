@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+
 import { 
   BookOpen, 
   FileText, 
@@ -68,7 +71,7 @@ export default function Sidebar() {
           <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-blue-900 dark:border-gray-900"></div>
         </div>
         <div>
-          <p className="font-semibold text-sm">Alex Morgan</p>
+          <p className="font-semibold text-sm">{useSelector((state: RootState) => state.auth.user?.name ?? 'Guest')}</p>
           <p className="text-blue-200 dark:text-gray-400 text-xs capitalize">{role}</p>
         </div>
       </div>

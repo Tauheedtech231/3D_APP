@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Mail, Phone, BookOpen, Bell, Shield, Upload } from "lucide-react";
+import { User, Mail, Phone, BookOpen, Shield, Upload } from "lucide-react";
 
 export default function InstructorSettings() {
   // Profile state
@@ -93,9 +94,11 @@ export default function InstructorSettings() {
                   <div className="flex flex-col items-center space-y-4">
                     <div className="relative">
                       <div className="h-32 w-32 rounded-full overflow-hidden">
-                        <img 
+                        <Image 
                           src={profile.avatar} 
                           alt="Profile" 
+                          width={128}
+                          height={128}
                           className="h-full w-full object-cover"
                         />
                       </div>

@@ -1,11 +1,12 @@
 "use client";
+/* eslint-disable */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Plus, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { Search, Plus, Clock, CheckCircle, AlertCircle, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface Assignment {
@@ -22,71 +23,84 @@ interface Assignment {
 export default function InstructorAssignments() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [assignments] = useState<Assignment[]>([
-    {
-      id: "1",
-      title: "HTML Structure and Basic Elements",
-      course: "Introduction to HTML & CSS",
-      dueDate: "2023-12-15",
-      status: "active",
-      submissionsCount: 18,
-      gradedCount: 12,
-      createdAt: "2023-11-30"
-    },
-    {
-      id: "2",
-      title: "CSS Styling and Selectors",
-      course: "Introduction to HTML & CSS",
-      dueDate: "2023-12-20",
-      status: "active",
-      submissionsCount: 15,
-      gradedCount: 8,
-      createdAt: "2023-12-01"
-    },
-    {
-      id: "3",
-      title: "Variables and Data Types",
-      course: "Programming Fundamentals",
-      dueDate: "2023-12-10",
-      status: "expired",
-      submissionsCount: 22,
-      gradedCount: 22,
-      createdAt: "2023-11-25"
-    },
-    {
-      id: "4",
-      title: "Control Structures and Loops",
-      course: "Programming Fundamentals",
-      dueDate: "2023-12-18",
-      status: "active",
-      submissionsCount: 20,
-      gradedCount: 5,
-      createdAt: "2023-12-02"
-    },
-    {
-      id: "5",
-      title: "Database Design Principles",
-      course: "Database Management",
-      dueDate: "2023-12-25",
-      status: "draft",
-      submissionsCount: 0,
-      gradedCount: 0,
-      createdAt: "2023-12-05"
-    },
-    {
-      id: "6",
-      title: "SQL Queries and Operations",
-      course: "Database Management",
-      dueDate: "2024-01-05",
-      status: "draft",
-      submissionsCount: 0,
-      gradedCount: 0,
-      createdAt: "2023-12-08"
-    },
-  ]);
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
 
-  const filteredAssignments = assignments.filter(assignment => {
+  // const fetchAssignments = async () => {
+  const fetchAssignments = async () => {
+  try {
+    setLoading(true);
+   const response = await fetch("http://localhost:5000/api/assignments?instructorId=1");
+ // TODO: Get from auth
+    if (response.ok) {
+      const assignmentsData = await response.json();
+      console.log("the assignments data", assignmentsData);
+
+      const today = new Date();
+
+      // Map API response into frontend expected structure
+      const mappedAssignments = assignmentsData.map((a: any) => {
+        let status: "active" | "draft" | "expired" = "draft";
+
+        if (a.due_date) {
+          const dueDate = new Date(a.due_date);
+          if (dueDate >= today) {
+           
+            status = "active";
+          } else {
+            status = "expired";
+          }
+        }
+
+        return {
+          id: a.id,
+          title: a.title,
+          course: a.courses?.title || "",
+          dueDate: a.due_date,
+          createdAt: a.created_at,
+          status,
+          submissionsCount:a.submissionsCount,
+
+          gradedCount:a.
+gradedCount       // placeholder until backend provides
+        };
+      });
+
+      setAssignments(mappedAssignments);
+    } else {
+      console.error("Failed to fetch assignments");
+    }
+  } catch (error) {
+    console.error("Error fetching assignments:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+ 
+  //     setLoading(true);
+  //     const response = await fetch('http://localhost:5000/api/assignments?instructorId=1'); // TODO: Get from auth
+  //     if (response.ok) {
+  //       const assignmentsData = await response.json();
+  //       console.log("the assignments data",assignmentsData)
+  //       setAssignments(assignmentsData);
+  //     } else {
+  //       console.error('Failed to fetch assignments');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching assignments:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const displayAssignments = assignments;
+
+  const filteredAssignments = displayAssignments.filter(assignment => {
     const matchesSearch = 
       assignment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       assignment.course.toLowerCase().includes(searchQuery.toLowerCase());
@@ -99,13 +113,34 @@ export default function InstructorAssignments() {
     return matchesSearch;
   });
 
-  const activeCounts = assignments.filter(a => a.status === "active").length;
-  const draftCounts = assignments.filter(a => a.status === "draft").length;
-  const expiredCounts = assignments.filter(a => a.status === "expired").length;
+  const activeCounts = displayAssignments.filter(a => a.status === "active").length;
+  const draftCounts = displayAssignments.filter(a => a.status === "draft").length;
+  const expiredCounts = displayAssignments.filter(a => a.status === "expired").length;
 
-  const needsGradingCount = assignments.reduce((count, assignment) => {
+  const needsGradingCount = displayAssignments.reduce((count, assignment) => {
     return count + (assignment.submissionsCount - assignment.gradedCount);
   }, 0);
+
+  const deleteAssignment = async (assignmentId: string) => {
+    if (!confirm('Are you sure you want to delete this assignment?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/assignments?id=${assignmentId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setAssignments(prev => prev.filter(a => a.id !== assignmentId));
+      } else {
+        alert('Failed to delete assignment');
+      }
+    } catch (error) {
+      console.error('Error deleting assignment:', error);
+      alert('Failed to delete assignment');
+    }
+  };
 
   return (
     <div className="space-y-8 bg-gray-50 dark:bg-gray-900 text-xs text-blue-700 dark:text-blue-300 min-h-screen p-6 transition-colors">
@@ -115,9 +150,11 @@ export default function InstructorAssignments() {
           <h1 className="text-sm font-bold">Assignments</h1>
           <p className="text-xs">Create and manage assignments for your courses</p>
         </div>
-        <Button className="flex items-center gap-2 text-xs rounded-full">
-          <Plus className="h-3 w-3" />
-          <span>Create Assignment</span>
+        <Button className="flex items-center gap-2 text-xs rounded-full" asChild>
+          <Link href="/instructor/assignments/create">
+            <Plus className="h-3 w-3" />
+            <span>Create Assignment</span>
+          </Link>
         </Button>
       </div>
 
@@ -177,7 +214,7 @@ export default function InstructorAssignments() {
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 w-full max-w-md text-xs rounded-md">
-            <TabsTrigger value="all" className="rounded-md">All ({assignments.length})</TabsTrigger>
+            <TabsTrigger value="all" className="rounded-md">All ({displayAssignments.length})</TabsTrigger>
             <TabsTrigger value="active" className="rounded-md">Active ({activeCounts})</TabsTrigger>
             <TabsTrigger value="draft" className="rounded-md">Drafts ({draftCounts})</TabsTrigger>
             <TabsTrigger value="expired" className="rounded-md">Expired ({expiredCounts})</TabsTrigger>
@@ -234,9 +271,7 @@ export default function InstructorAssignments() {
                       <td className="py-2 px-3">{assignment.course}</td>
                       <td className="py-2 px-3">
                         <p>{new Date(assignment.dueDate).toLocaleDateString()}</p>
-                        {assignment.status !== "draft" && (
-                          <p className={`text-[10px] ${dueDateClass}`}>{dueDateText}</p>
-                        )}
+                       
                       </td>
                       <td className="py-2 px-3">
                         <span 
@@ -246,7 +281,7 @@ export default function InstructorAssignments() {
                             "bg-red-100 text-red-700"
                           }`}
                         >
-                          {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                         {assignment.status}
                         </span>
                       </td>
                       <td className="py-2 px-3">
@@ -267,6 +302,14 @@ export default function InstructorAssignments() {
                               <Button size="sm" className="text-xs rounded-full">Grade</Button>
                             </Link>
                           )}
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs rounded-full text-red-600 hover:text-red-700"
+                            onClick={() => deleteAssignment(assignment.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -276,8 +319,16 @@ export default function InstructorAssignments() {
             </table>
           </div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-xs text-gray-600">Loading assignments...</p>
+            </div>
+          )}
+
           {/* Empty State */}
-          {filteredAssignments.length === 0 && (
+          {!loading && filteredAssignments.length === 0 && (
             <div className="text-center py-12">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -286,10 +337,12 @@ export default function InstructorAssignments() {
               <p className="text-[10px] mt-1">
                 {searchQuery ? "Try adjusting your search query" : "Create your first assignment to get started"}
               </p>
-              <Button className="mt-3 flex items-center gap-2 text-xs rounded-full">
-                <Plus className="h-3 w-3" />
-                <span>Create Assignment</span>
-              </Button>
+              <Link href="/instructor/assignments/create">
+                <Button className="mt-3 flex items-center gap-2 text-xs rounded-full">
+                  <Plus className="h-3 w-3" />
+                  <span>Create Assignment</span>
+                </Button>
+              </Link>
             </div>
           )}
         </CardContent>

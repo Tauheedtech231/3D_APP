@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import CourseTable from "../components/CourseTable";
 import { Course } from "../types";
 
-const LOCAL_STORAGE_KEY = "courses";
-
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);

@@ -31,7 +31,7 @@ const Reports: React.FC<ReportsProps> = ({ engagement, students, courses, transa
       case 'courses':
         csvContent += 'ID,Title,Instructor,Enrollment Count\n';
         courses.forEach(course => {
-          csvContent += `${course.id},${course.title},${course.instructor},${course.enrollmentCount}\n`;
+          csvContent += `${course.id},${course.title},${course.instructor?.name || 'No Instructor'},${course.enrollmentCount}\n`;
         });
         break;
       case 'revenue':
@@ -142,7 +142,7 @@ const Reports: React.FC<ReportsProps> = ({ engagement, students, courses, transa
               <tr key={course.id} className="hover:bg-blue-50 dark:hover:bg-gray-600 rounded-xl">
                 <td className="px-3 py-2">{course.id}</td>
                 <td className="px-3 py-2">{course.title}</td>
-                <td className="px-3 py-2">{course.instructor}</td>
+                <td className="px-3 py-2">{course.instructor?.name || 'No Instructor'}</td>
                 <td className="px-3 py-2">{course.enrollmentCount}</td>
               </tr>
             ))}

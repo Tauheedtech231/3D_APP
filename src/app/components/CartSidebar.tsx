@@ -2,6 +2,8 @@
 import { FC, useState } from "react";
 import Image from "next/image";
 import { confirmPayment } from "../(dashboard)/actions/paymentActions";
+import { useAppSelector } from "@/hooks/redux";
+import type { RootState } from "@/store/store";
 
 interface Course {
   id: number;
@@ -26,21 +28,40 @@ interface CartSidebarProps {
 
 const CartSidebar: FC<CartSidebarProps> = ({ cart, visible, onClose, removeFromCart }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const getTotalItems = () => cart.reduce((total, item) => total + item.quantity, 0);
   const getTotalPrice = () => cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const handleCheckout = () => setModalOpen(true);
+  const { user } = useAppSelector((state: RootState) => state.auth);
+
   const handleConfirmPayment = async () => {
-  try {
-    await confirmPayment("Test Student", "student@example.com", getTotalPrice());
-    alert("Payment submitted! Check your email.");
-    setModalOpen(false);
-    removeFromCart(-1);
-  } catch (error) {
-    alert("Error sending emails.");
-  }
-};
+    if (!user) {
+      alert("Please sign in to complete your purchase.");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      const cartItems = cart.map(item => ({
+        name: item.name,
+        price: item.price * item.quantity
+      }));
+
+      await confirmPayment(user.name, user.email, getTotalPrice(), cartItems);
+      
+      alert("Payment submitted! Please check your email for confirmation.");
+      setModalOpen(false);
+      onClose(); // Close the cart sidebar
+      removeFromCart(-1); // Clear the cart
+    } catch (error) {
+      console.error('Payment confirmation error:', error);
+      alert("There was an error processing your payment. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   if (!visible) return null;
 
@@ -106,15 +127,41 @@ const CartSidebar: FC<CartSidebarProps> = ({ cart, visible, onClose, removeFromC
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-11/12 max-w-md shadow-lg">
-            <h3 className="text-xl font-bold text-blue-700 dark:text-blue-300 mb-4">Manual Payment Instructions</h3>
-            <p className="text-blue-500 dark:text-blue-200 mb-4">
-              Please transfer <span className="font-semibold text-blue-700 dark:text-blue-300">${getTotalPrice().toFixed(2)}</span> 
-              to the following account: <br />
-              <span className="font-semibold text-blue-700 dark:text-blue-300">Account: ABC123</span>
-            </p>
-            <p className="text-blue-500 dark:text-blue-200 mb-4">
-              After payment, click below to confirm your order.
-            </p>
+            <h3 className="text-xl font-bold text-blue-700 dark:text-blue-300 mb-4">Confirm Your Purchase</h3>
+            
+            {/* Course Summary */}
+            <div className="mb-6">
+              <h4 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">Order Summary</h4>
+              <div className="space-y-2 mb-4">
+                {cart.map(item => (
+                  <div key={item.id} className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-300">{item.name} (x{item.quantity})</span>
+                    <span className="font-medium text-blue-700 dark:text-blue-300">${(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+                <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
+                  <div className="flex justify-between font-semibold">
+                    <span className="text-gray-800 dark:text-gray-200">Total Amount</span>
+                    <span className="text-blue-700 dark:text-blue-300">${getTotalPrice().toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Instructions */}
+            <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 mb-6">
+              <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Payment Instructions</h4>
+              <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">
+                Please transfer the total amount to:
+              </p>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 text-sm">
+                <p className="mb-1"><span className="font-medium">Bank:</span> ABC Bank</p>
+                <p className="mb-1"><span className="font-medium">Account Number:</span> 1234-5678-9012</p>
+                <p><span className="font-medium">Account Name:</span> MANSOL LMS</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
             <div className="flex justify-end space-x-3">
               <button 
                 onClick={() => setModalOpen(false)}
@@ -124,9 +171,20 @@ const CartSidebar: FC<CartSidebarProps> = ({ cart, visible, onClose, removeFromC
               </button>
               <button
                 onClick={handleConfirmPayment}
-                className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-semibold transition"
+                disabled={isProcessing}
+                className={`px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-semibold transition flex items-center justify-center min-w-[120px] ${isProcessing ? 'opacity-75 cursor-not-allowed' : ''}`}
               >
-                Confirm Payment
+                {isProcessing ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  'Confirm Purchase'
+                )}
               </button>
             </div>
           </div>

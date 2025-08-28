@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+
 import { Student, Course, Engagement } from '../types';
 import PerformanceChart from './PerFormanceCharts';
 

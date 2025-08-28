@@ -3,7 +3,7 @@ import { Student, Engagement,Transaction } from '../types';
 
 export const calculateAverageProgress = (students: Student[]): number => {
   if (students.length === 0) return 0;
-  const total = students.reduce((sum, student) => sum + student.progress, 0);
+  const total = students.reduce((sum, student) => sum + (student.progress ?? 0), 0);
   return Math.round(total / students.length);
 };
 

@@ -1,228 +1,215 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Assignment } from "@/app/(dashboard)/student/assignments/data/assignment";
-import { ChevronLeft, Calendar, Download, Upload, FileText, AlertCircle, CheckCircle } from "lucide-react";
-import Link from "next/link";
+import { useState } from 'react';
+import { Assignment } from '@/app/(dashboard)/student/assignments/data/assignment';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { AlertCircle, FileText, Upload } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface AssignmentDetailsProps {
   assignment: Assignment;
+  onSubmit: (formData: FormData) => Promise<void>;
 }
 
-export default function AssignmentDetails({ assignment }: AssignmentDetailsProps) {
+export default function AssignmentDetails({ assignment, onSubmit }: AssignmentDetailsProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [submissionText, setSubmissionText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(assignment.status === "Submitted" || assignment.status === "Graded");
-  const [submissionError, setSubmissionError] = useState("");
+  const [error, setError] = useState('');
+  console.log("the assignments ha",assignment)
+  const isPastDue = new Date(assignment.due_date) < new Date();
+  const isSubmitted = assignment.status === 'Submitted' || assignment.status === 'Graded';
+  const isGraded = assignment.status === 'Graded';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-      setSubmissionError("");
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setError('');
     }
   };
 
-  const handleSubmit = () => {
-    if (!selectedFile) {
-      setSubmissionError("Please select a file to upload");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    // Validate submission based on format requirements
+    if (assignment.submission_format === 'file' && !selectedFile) {
+      setError('Please select a file to submit');
+      return;
+    }
+    if (assignment.submission_format === 'text' && !submissionText.trim()) {
+      setError('Please enter your submission text');
+      return;
+    }
+    if (assignment.submission_format === 'both' && !selectedFile && !submissionText.trim()) {
+      setError('Please provide either a file or text submission');
       return;
     }
 
-    setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      setIsSubmitting(true);
+      const formData = new FormData();
+      formData.append('assignmentId', assignment.id.toString());
+      formData.append('studentId', '2'); // TODO: Get from auth session
+
+      if (selectedFile) {
+        formData.append('file', selectedFile);
+      }
+      if (submissionText.trim()) {
+        formData.append('submissionText', submissionText.trim());
+      }
+
+      await onSubmit(formData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to submit assignment');
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 2000);
+    }
   };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const isOverdue = assignment.status === "Overdue";
-  const isGraded = assignment.status === "Graded";
-  const dueDate = new Date(assignment.dueDate);
-  const now = new Date();
-  const isPastDue = dueDate < now;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <Link href="/student/assignments" className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mb-4 text-sm">
-        <ChevronLeft size={18} />
-        Back to Assignments
-      </Link>
-      
-      <div className="bg-white dark:bg-gray-800/60 backdrop-blur-md rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex justify-between items-start mb-3">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">{assignment.title}</h1>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">{assignment.module}</p>
-            </div>
-            <div className="text-right">
-              <div className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 ${
-                isOverdue 
-                  ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300" 
-                  : isGraded 
-                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
-                    : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-              }`}>
-                {isOverdue ? <AlertCircle size={12} /> : isGraded ? <CheckCircle size={12} /> : <FileText size={12} />}
-                {assignment.status}
-              </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{assignment.maxPoints} points</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-2">
-            <Calendar size={14} />
-            <span className={isPastDue && !isGraded ? "text-red-600 dark:text-red-400 font-medium" : ""}>
-              Due: {formatDate(assignment.dueDate)}
-              {isPastDue && !isGraded && " (Past due)"}
-            </span>
-          </div>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-2">{assignment.title}</h2>
+        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <FileText className="h-4 w-4 mr-2" />
+          <span>Course: {assignment.courses?.title || `Course ${assignment.course_id}`}</span>
         </div>
-        
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Description</h2>
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">{assignment.description}</p>
-          
-          <div className="bg-blue-50/30 dark:bg-blue-900/30 p-3 rounded-lg border border-blue-100 dark:border-blue-700">
-            <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-1 text-sm">Instructions</h3>
-            <p className="text-sm text-blue-700 dark:text-blue-200">{assignment.instructions}</p>
-          </div>
-        </div>
-        
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">Resources</h2>
-          <div className="space-y-2">
-            {assignment.resources.map((resource) => (
-              <div key={resource.id} className="flex items-center justify-between p-2 bg-gray-50/50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-600 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="bg-blue-100 dark:bg-blue-900 p-1 rounded-lg">
-                    <FileText size={16} className="text-blue-600 dark:text-blue-300" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-800 dark:text-gray-200">{resource.title}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{resource.type} {resource.size && `• ${resource.size}`}</p>
-                  </div>
-                </div>
-                <a 
-                  href={resource.url} 
-                  className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-xs"
-                  download
-                >
-                  <Download size={14} />
-                  Download
-                </a>
-              </div>
-            ))}
+
+        <div className="prose dark:prose-invert max-w-none mb-6">
+          <h3 className="text-lg font-semibold mb-2">Description</h3>
+          <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap mb-4">
+            {assignment.description}
+          </p>
+
+          <h3 className="text-lg font-semibold mb-2">Instructions</h3>
+          <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap mb-4">
+            {assignment.instructions}
+          </p>
+
+          <div className="flex flex-col space-y-2 text-sm text-gray-500 dark:text-gray-400">
+            <p>Due: {format(new Date(assignment.due_date), 'PPP pp')}</p>
+            <p>Points: {assignment.total_points}</p>
+            <p>Submission Format: {assignment.submission_format === 'both' ? 'File and Text' :
+              assignment.submission_format === 'file' ? 'File only' : 'Text only'}</p>
           </div>
         </div>
 
-        {!isGraded && (
-          <div className="p-4">
-            <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              {isSubmitted ? "Submission Details" : "Submit Assignment"}
-            </h2>
-            
-            {isSubmitted && assignment.submission ? (
-              <div className="bg-blue-50/30 dark:bg-blue-900/30 p-3 rounded-lg border border-blue-200 dark:border-blue-700 text-sm text-blue-700 dark:text-blue-200">
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <p className="font-medium text-blue-800 dark:text-blue-300">Submitted File</p>
-                    <p className="text-sm text-blue-700 dark:text-blue-200">{assignment.submission.fileName}</p>
-                  </div>
-                  <span className="text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-800 px-1 py-0.5 rounded">
-                    {assignment.submission.fileSize}
-                  </span>
-                </div>
-                <p className="text-xs text-blue-700 dark:text-blue-200">
-                  Submitted on {new Date(assignment.submission.submittedAt).toLocaleString()}
+        {isPastDue && !assignment.allow_late_submission && !isSubmitted && (
+          <div className="flex items-center p-4 mb-6 text-red-800 bg-red-50 dark:bg-red-900/50 dark:text-red-200 rounded-lg">
+            <AlertCircle className="h-5 w-5 mr-2" />
+            <span>This assignment is past due and late submissions are not allowed.</span>
+          </div>
+        )}
+
+        {isSubmitted ? (
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-semibold mb-3">Your Submission</h3>
+            {assignment.submission?.file_url && (
+              <div className="mb-3">
+                <a
+                  href={assignment.submission.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 flex items-center"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  {assignment.submission.file_name}
+                  {assignment.submission.file_size && (
+                    <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                      ({Math.round(assignment.submission.file_size / 1024)} KB)
+                    </span>
+                  )}
+                </a>
+              </div>
+            )}
+            {assignment.submission?.submission_text && (
+              <div className="mb-3">
+                <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
+                  {assignment.submission.submission_text}
                 </p>
-                {isPastDue && (
-                  <p className="text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1">
-                    <AlertCircle size={12} />
-                    Late submission
+              </div>
+            )}
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Submitted: {assignment.submission?.submitted_at ? format(new Date(assignment.submission.submitted_at), 'PPP pp') : 'Not available'}
+            </p>
+            {isGraded && assignment.submission?.grade && (
+              <div className="mt-4">
+                <p className="font-semibold">
+                  Grade: {assignment.submission.grade.points_earned} points
+                </p>
+                {assignment.submission.grade.feedback && (
+                  <p className="mt-2 text-gray-600 dark:text-gray-300">
+                    Feedback: {assignment.submission.grade.feedback}
                   </p>
                 )}
               </div>
-            ) : (
-              <>
-                <div className="mb-4">
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Upload your submission</label>
-                  <div className="flex items-center gap-2">
-                    <label className="flex-1 cursor-pointer">
-                      <input 
-                        type="file" 
-                        className="hidden" 
-                        onChange={handleFileChange}
-                        disabled={isSubmitting}
-                      />
-                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 text-center hover:border-blue-400 dark:hover:border-blue-500 transition-colors text-sm">
-                        {selectedFile ? (
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <FileText size={18} className="text-blue-600 dark:text-blue-300" />
-                              <span className="font-medium text-gray-800 dark:text-gray-200">{selectedFile.name}</span>
-                            </div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="py-2">
-                            <Upload size={20} className="mx-auto text-gray-400 dark:text-gray-500 mb-1" />
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Click to select a file or drag & drop</p>
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                  </div>
-                  {submissionError && (
-                    <p className="text-red-600 dark:text-red-400 text-xs mt-1 flex items-center gap-1">
-                      <AlertCircle size={12} />
-                      {submissionError}
-                    </p>
-                  )}
-                </div>
-                
-                <div className="flex justify-end">
-                  <motion.button
-                    whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                    whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className={`px-4 py-2 rounded-lg font-medium flex items-center gap-1 text-sm ${
-                      isSubmitting 
-                        ? "bg-gray-300 text-gray-600 cursor-not-allowed dark:bg-gray-600 dark:text-gray-400" 
-                        : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white"
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white dark:border-gray-200"></div>
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Upload size={14} />
-                        Submit
-                      </>
-                    )}
-                  </motion.button>
-                </div>
-              </>
             )}
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="border-t pt-4">
+            <h3 className="text-lg font-semibold mb-3">Submit Assignment</h3>
+            
+            {(assignment.submission_format === 'file' || assignment.submission_format === 'both') && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  File Submission
+                </label>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                    className="relative"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Choose File
+                    <input
+                      id="file-upload"
+                      type="file"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </Button>
+                  {selectedFile && (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {(assignment.submission_format === 'text' || assignment.submission_format === 'both') && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Text Submission
+                </label>
+                <Textarea
+                  value={submissionText}
+                  onChange={(e) => setSubmissionText(e.target.value)}
+                  placeholder="Enter your submission text here..."
+                  className="min-h-[200px]"
+                />
+              </div>
+            )}
+
+            {error && (
+              <div className="text-red-500 dark:text-red-400 text-sm mb-4">
+                {error}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={isSubmitting || (isPastDue && !assignment.allow_late_submission)}
+              className="w-full sm:w-auto"
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Assignment'}
+            </Button>
+          </form>
         )}
       </div>
     </div>
