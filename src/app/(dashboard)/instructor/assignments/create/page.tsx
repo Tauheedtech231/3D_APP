@@ -48,7 +48,7 @@ const CreateAssignment: React.FC = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/courses');
+      const response = await fetch('http://31.97.49.20/api/courses');
       if (response.ok) {
         const coursesData = await response.json();
         console.log("the data c",coursesData)
@@ -112,7 +112,7 @@ const CreateAssignment: React.FC = () => {
   
       console.log('Submitting assignment data:', assignmentData); // Debug log
   
-      const response = await fetch('http://localhost:5000/api/assignments', {
+      const response = await fetch('http://31.97.49.20/api/assignments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

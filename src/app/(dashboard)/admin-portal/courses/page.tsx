@@ -13,7 +13,7 @@ useEffect(() => {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/api/courses"); // backend route
+      const res = await fetch("http://31.97.49.20/api/courses"); // backend route
       if (!res.ok) throw new Error("Failed to fetch courses from server");
 
       const data = await res.json();

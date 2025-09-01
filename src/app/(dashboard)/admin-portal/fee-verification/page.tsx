@@ -24,7 +24,7 @@ export default function PaymentsPage() {
   const fetchPayments = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/payments");
+      const res = await fetch("http://31.97.49.20/api/payments");
       const result = await res.json();
 
       if (result.success && Array.isArray(result.data)) {
@@ -44,7 +44,7 @@ export default function PaymentsPage() {
   const updateStatus = async (id: number, newStatus: string) => {
     setUpdating(id);
     try {
-      await fetch(`http://localhost:5000/api/payments/${id}`, {
+      await fetch(`http://31.97.49.20/api/payments/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),

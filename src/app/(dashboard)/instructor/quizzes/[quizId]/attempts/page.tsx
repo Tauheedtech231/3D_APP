@@ -29,7 +29,7 @@ const QuizAttemptsPage = () => {
   useEffect(() => {
     const fetchAttempts = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/quiz-attempts/quiz/${quizId}`);
+      const response = await fetch(`http://31.97.49.20/api/quiz-attempts/quiz/${quizId}`);
       if (!response.ok) throw new Error('Failed to fetch attempts');
       const data = await response.json();
       console.log("the data",data)
@@ -48,7 +48,7 @@ const QuizAttemptsPage = () => {
   const handleAutoGrade = async (attemptId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/quiz-attempts/${attemptId}/auto-grade`,
+        `http://31.97.49.20/api/quiz-attempts/${attemptId}/auto-grade`,
         { method: 'POST' }
       );
 

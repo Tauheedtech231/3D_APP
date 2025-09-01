@@ -41,7 +41,7 @@ export default function AssignmentGrading() {
 const fetchAssignmentData = async () => {
   try {
     setLoading(true);
-    const response = await fetch(`http://localhost:5000/api/assignments/${assignmentId}`);
+    const response = await fetch(`http://31.97.49.20/api/assignments/${assignmentId}`);
     console.log("the res",response)
     if (response.ok) {
       const data = await response.json();
@@ -158,7 +158,7 @@ total_points
     
     // Send grade and feedback to API
     try {
-      const response = await fetch(`http://localhost:5000/api/assignments/${assignmentId}/grade`, {
+      const response = await fetch(`http://31.97.49.20/api/assignments/${assignmentId}/grade`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -284,7 +284,7 @@ total_points
                 {selectedSubmission.attachmentUrl && (
   <Button variant="outline" size="sm" className="flex items-center gap-1" asChild>
     <a
-      href={`http://localhost:5000${selectedSubmission.attachmentUrl}`}
+      href={`http://31.97.49.20${selectedSubmission.attachmentUrl}`}
       download
     >
       <Download className="h-4 w-4" />

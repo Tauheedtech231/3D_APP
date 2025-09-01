@@ -38,7 +38,7 @@ const AddCourseForm: React.FC = () => {
   useEffect(() => {
   const fetchInstructors = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/instructors");
+      const res = await fetch("http://31.97.49.20/api/instructors");
       const data: { id: number; name: string }[] = await res.json();
       setInstructors(data);
     } catch (err) {
@@ -89,7 +89,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   try {
-    const res = await fetch("http://localhost:5000/api/courses", {
+    const res = await fetch("http://31.97.49.20/api/courses", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

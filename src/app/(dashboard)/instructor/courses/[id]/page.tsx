@@ -16,7 +16,7 @@ export default function CoursePage() {
         setLoading(true);
 
         // ✅ Fetch from backend API
-        const res = await fetch(`http://localhost:5000/api/courses/${id}`);
+        const res = await fetch(`http://31.97.49.20/api/courses/${id}`);
         if (!res.ok) throw new Error("Failed to fetch course");
 
         const data: Course = await res.json();

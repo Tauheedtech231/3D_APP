@@ -34,7 +34,7 @@ export default function InstructorAssignments() {
   const fetchAssignments = async () => {
   try {
     setLoading(true);
-   const response = await fetch("http://localhost:5000/api/assignments?instructorId=1");
+   const response = await fetch("http://31.97.49.20/api/assignments?instructorId=1");
  // TODO: Get from auth
     if (response.ok) {
       const assignmentsData = await response.json();
@@ -83,7 +83,7 @@ gradedCount       // placeholder until backend provides
 
  
   //     setLoading(true);
-  //     const response = await fetch('http://localhost:5000/api/assignments?instructorId=1'); // TODO: Get from auth
+  //     const response = await fetch('http://31.97.49.20/api/assignments?instructorId=1'); // TODO: Get from auth
   //     if (response.ok) {
   //       const assignmentsData = await response.json();
   //       console.log("the assignments data",assignmentsData)

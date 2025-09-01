@@ -24,7 +24,7 @@ export default function StudentDetail() {
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/students/${studentId}`);
+        const response = await fetch(`http://31.97.49.20/api/students/${studentId}`);
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
           throw new Error(errorData?.message || 'Failed to fetch student data');

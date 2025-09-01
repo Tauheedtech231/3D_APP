@@ -32,7 +32,7 @@ export default function InstructorStudents() {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/students/course/2');
+      const response = await fetch('http://31.97.49.20/api/students/course/2');
       if (response.ok) {
         const data = await response.json();
         console.log("the data",data)

@@ -55,7 +55,7 @@ const CreateQuiz: React.FC = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/courses');
+      const response = await fetch('http://31.97.49.20/api/courses');
       if (response.ok) {
         const data = await response.json();
         setCourses(data);
@@ -150,7 +150,7 @@ const CreateQuiz: React.FC = () => {
         }))
       };
 
-      const response = await fetch('http://localhost:5000/api/quizzes', {
+      const response = await fetch('http://31.97.49.20/api/quizzes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -43,7 +43,7 @@ const EditQuizPage = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/quizzes/${quizId}`);
+      const response = await fetch(`http://31.97.49.20/api/quizzes/${quizId}`);
       if (!response.ok) throw new Error('Failed to fetch quiz');
       const quiz: Quiz = await response.json();
 
@@ -128,7 +128,7 @@ const EditQuizPage = () => {
         questions: validQuestions
       };
 
-      const response = await fetch(`http://localhost:5000/api/quizzes/${quizId}`, {
+      const response = await fetch(`http://31.97.49.20/api/quizzes/${quizId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(quizData)

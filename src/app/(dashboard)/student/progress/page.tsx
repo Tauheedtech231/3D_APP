@@ -23,7 +23,7 @@ const StudentProgressCard: React.FC = () => {
     const fetchProgress = async () => {
       try {
         setLoading(true);
-        const res = await fetch('http://localhost:5000/api/student-progress/2/2');
+        const res = await fetch('http://31.97.49.20/api/student-progress/2/2');
         if (!res.ok) throw new Error('Failed to fetch progress');
         const data: StudentProgress = await res.json();
         setProgress(data);

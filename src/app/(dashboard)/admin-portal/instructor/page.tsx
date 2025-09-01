@@ -11,7 +11,7 @@ export default function InstructorsPage() {
   useEffect(() => {
     async function fetchInstructors() {
       try {
-        const response = await fetch("http://localhost:5000/api/instructors");
+        const response = await fetch("http://31.97.49.20/api/instructors");
         if (!response.ok) throw new Error("Failed to fetch instructors");
 
         const data: Instructor[] = await response.json();

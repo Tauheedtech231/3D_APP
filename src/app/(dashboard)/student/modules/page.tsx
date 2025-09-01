@@ -28,7 +28,7 @@ const StudentCoursesModules: React.FC = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/student-courses/${studentId}`);
+        const res = await fetch(`http://31.97.49.20/api/student-courses/${studentId}`);
         const data: Course[] = await res.json();
         setCourses(data);
       } catch (err) {

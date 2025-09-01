@@ -40,7 +40,7 @@ export default function ModulePage() {
     const fetchMaterials = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/module/${moduleId}`);
+        const res = await fetch(`http://31.97.49.20/api/module/${moduleId}`);
         if (!res.ok) throw new Error("Failed to fetch materials");
 
         const data: Material[] = await res.json();

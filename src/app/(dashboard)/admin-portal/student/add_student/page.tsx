@@ -31,7 +31,7 @@ const StudentForm: React.FC = () => {
 
   // Fetch courses from backend
 useEffect(() => {
-  fetch("http://localhost:5000/api/courses")
+  fetch("http://31.97.49.20/api/courses")
     .then((res) => res.json())
     .then((data: Course[]) => setCourses(data))
     .catch((err) => console.error(err));
@@ -59,7 +59,7 @@ useEffect(() => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/students", {
+      const res = await fetch("http://31.97.49.20/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

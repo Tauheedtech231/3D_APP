@@ -24,7 +24,7 @@ const AssignmentDashboard: React.FC = () => {
   const fetchAssignments = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/assignments/student/course?courseId=${courseId}&studentId=${studentId}`
+        `http://31.97.49.20/api/assignments/student/course?courseId=${courseId}&studentId=${studentId}`
       );
       const data: Assignment[] = await res.json();
 
@@ -32,7 +32,7 @@ const AssignmentDashboard: React.FC = () => {
         data.map(async (assignment) => {
           if (assignment.submissionStatus === 'Submitted') {
             const gradeRes = await fetch(
-              `http://localhost:5000/api/assignments/student/grade?assignmentId=${assignment.id}&studentId=${studentId}`
+              `http://31.97.49.20/api/assignments/student/grade?assignmentId=${assignment.id}&studentId=${studentId}`
             );
             const gradeData = await gradeRes.json();
             return { ...assignment, grade: gradeData.graded ? gradeData.pointsEarned : null };

@@ -29,7 +29,7 @@ const AssignmentSubmitPage: React.FC = () => {
     const fetchAssignment = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/assignments/student/course?courseId=2&studentId=${studentId}`
+          `http://31.97.49.20/api/assignments/student/course?courseId=2&studentId=${studentId}`
         );
         const data: Assignment[] = await res.json();
         const current = data.find((a) => a.id === assignmentId) || null;
@@ -60,7 +60,7 @@ const AssignmentSubmitPage: React.FC = () => {
   //       fileUrl = `uploads/${file.name}`;
   //     }
 
-  //     const res = await fetch('http://localhost:5000/api/assignments/student/submit', {
+  //     const res = await fetch('http://31.97.49.20/api/assignments/student/submit', {
   //       method: 'POST',
   //       headers: { 'Content-Type': 'application/json' },
   //       body: JSON.stringify({
@@ -98,7 +98,7 @@ const AssignmentSubmitPage: React.FC = () => {
     formData.append('submissionText', submissionText);
     if (file) formData.append('file', file);
 
-    const res = await fetch('http://localhost:5000/api/assignments/student/submit', {
+    const res = await fetch('http://31.97.49.20/api/assignments/student/submit', {
       method: 'POST',
       body: formData,
     });

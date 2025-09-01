@@ -25,7 +25,7 @@ const InstructorForm: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/instructors", {
+      const response = await fetch("http://31.97.49.20/api/instructors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

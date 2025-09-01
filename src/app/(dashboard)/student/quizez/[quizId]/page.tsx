@@ -48,7 +48,7 @@ export default function QuizAttemptPage() {
     
     const fetchQuiz = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/quizzes/${quizId}`);
+        const response = await fetch(`http://31.97.49.20/api/quizzes/${quizId}`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data: Quiz = await response.json();
 
@@ -84,7 +84,7 @@ export default function QuizAttemptPage() {
       if (!quiz) return;
       
       // First create an attempt
-      const createAttemptResponse = await fetch(`http://localhost:5000/api/quizzes/${quizId}/attempts`, {
+      const createAttemptResponse = await fetch(`http://31.97.49.20/api/quizzes/${quizId}/attempts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ studentId: 2 }), // TODO: Get from auth session
@@ -94,7 +94,7 @@ export default function QuizAttemptPage() {
       const attempt = await createAttemptResponse.json();
       
       // Then submit the answers
-      const submitResponse = await fetch(`http://localhost:5000/api/quizzes/attempts/${attempt.id}/submit`, {
+      const submitResponse = await fetch(`http://31.97.49.20/api/quizzes/attempts/${attempt.id}/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

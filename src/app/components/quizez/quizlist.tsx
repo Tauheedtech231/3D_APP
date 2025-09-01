@@ -46,7 +46,7 @@ export default function QuizList() {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/quizzes/student');
+        const response = await fetch('http://31.97.49.20/api/quizzes/student');
         if (response.ok) {
           const data: BackendQuiz[] = await response.json();
           console.log("the data", data);

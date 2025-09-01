@@ -19,7 +19,7 @@ export default function InstructorPage() {
         setLoading(true);
 
         // Call API (Express/Supabase route)
-        const res = await fetch(`http://localhost:5000/api/instructors/${id}`);
+        const res = await fetch(`http://31.97.49.20/api/instructors/${id}`);
         if (!res.ok) throw new Error("Failed to fetch instructor data");
 
         const data = await res.json();

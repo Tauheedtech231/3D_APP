@@ -16,9 +16,9 @@ export default function DashboardPage() {
     async function loadData() {
       try {
         const [studentsRes, coursesRes, engagementRes] = await Promise.all([
-          fetch("http://localhost:5000/api/dashboard/students"),
-          fetch("http://localhost:5000/api/dashboard/courses"),
-          fetch("http://localhost:5000/api/dashboard/engagement"),
+          fetch("http://31.97.49.20/api/dashboard/students"),
+          fetch("http://31.97.49.20/api/dashboard/courses"),
+          fetch("http://31.97.49.20/api/dashboard/engagement"),
         ]);
 
         const [studentsData, coursesData, engagementData] = await Promise.all([

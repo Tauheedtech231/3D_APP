@@ -61,7 +61,7 @@ const GradeAssignment: React.FC = () => {
       const fetchData = async () => {
         try {
           setLoading(true);
-          const response = await fetch(`http://localhost:5000/api/assignments/${assignmentId}`);
+          const response = await fetch(`http://31.97.49.20/api/assignments/${assignmentId}`);
           if (response.ok) {
             const data = await response.json();
             setAssignment(data);
@@ -78,7 +78,7 @@ const GradeAssignment: React.FC = () => {
       const fetchSubs = async () => {
         try {
           setLoading(true);
-          const response = await fetch(`http://localhost:5000/api/assignments/${assignmentId}/submissions`);
+          const response = await fetch(`http://31.97.49.20/api/assignments/${assignmentId}/submissions`);
           if (response.ok) {
             const data = await response.json();
             setSubmissions(data);
@@ -119,7 +119,7 @@ const GradeAssignment: React.FC = () => {
       };
 
       // API call to grade submission
-      const response = await fetch(`http://localhost:5000/api/assignments/${assignmentId}/grade`, {
+      const response = await fetch(`http://31.97.49.20/api/assignments/${assignmentId}/grade`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

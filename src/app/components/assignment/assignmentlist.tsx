@@ -14,7 +14,7 @@ export default function AssignmentList() {
     const fetchAssignments = async () => {
       try {
         const studentId = 2; // TODO: Get from auth session
-        const response = await fetch(`http://localhost:5000/api/assignments/student/${studentId}`);
+        const response = await fetch(`http://31.97.49.20/api/assignments/student/${studentId}`);
         if (response.ok) {
           const data = await response.json();
           console.log('Raw API response:', data);

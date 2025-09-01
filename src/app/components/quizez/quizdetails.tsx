@@ -29,7 +29,7 @@ export default function QuizDetails({ quiz }: QuizDetailsProps) {
 
     try {
       // Create a quiz attempt
-      const attemptResponse = await fetch(`http://localhost:5000/api/quizzes/${quiz.id}/attempts`, {
+      const attemptResponse = await fetch(`http://31.97.49.20/api/quizzes/${quiz.id}/attempts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -46,7 +46,7 @@ export default function QuizDetails({ quiz }: QuizDetailsProps) {
         answer
       }));
 
-      const submitResponse = await fetch(`http://localhost:5000/api/quizzes/attempts/${attempt.id}/submit`, {
+      const submitResponse = await fetch(`http://31.97.49.20/api/quizzes/attempts/${attempt.id}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -56,7 +56,7 @@ export default function QuizDetails({ quiz }: QuizDetailsProps) {
       if (!submitResponse.ok) throw new Error('Failed to submit answers');
 
       // Get the graded attempt
-      const gradedResponse = await fetch(`http://localhost:5000/api/quizzes/attempts/${attempt.id}`);
+      const gradedResponse = await fetch(`http://31.97.49.20/api/quizzes/attempts/${attempt.id}`);
       if (!gradedResponse.ok) throw new Error('Failed to get graded attempt');
       await gradedResponse.json();
       

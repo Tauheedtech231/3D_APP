@@ -11,7 +11,7 @@ const Students: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/students"); // Backend route
+        const res = await fetch("http://31.97.49.20/api/students"); // Backend route
         if (!res.ok) {
           throw new Error("Failed to fetch students");
         }

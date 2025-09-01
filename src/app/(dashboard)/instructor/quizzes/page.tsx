@@ -26,7 +26,7 @@ const QuizzesPage = () => {
 
   const fetchQuizzes = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/quizzes');
+      const response = await fetch('http://31.97.49.20/api/quizzes');
       if (!response.ok) throw new Error('Failed to fetch quizzes');
       const data = await response.json();
       console.log("the quiz data data",data)
@@ -43,7 +43,7 @@ const QuizzesPage = () => {
     if (!confirm('Are you sure you want to delete this quiz?')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/quizzes/${id}`, {
+      const response = await fetch(`http://31.97.49.20/api/quizzes/${id}`, {
         method: 'DELETE',
       });
 

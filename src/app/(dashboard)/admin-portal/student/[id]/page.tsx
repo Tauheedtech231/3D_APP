@@ -22,19 +22,19 @@ export default function StudentPage() {
         setLoading(true);
 
         // Fetch student info
-        const studentRes = await fetch(`http://localhost:5000/api/students/${id}`);
+        const studentRes = await fetch(`http://31.97.49.20/api/students/${id}`);
         if (!studentRes.ok) throw new Error("Failed to fetch student");
         const studentData: Student = await studentRes.json();
         setStudent(studentData);
 
         // Fetch all courses
-        const coursesRes = await fetch("http://localhost:5000/api/courses");
+        const coursesRes = await fetch("http://31.97.49.20/api/courses");
         if (!coursesRes.ok) throw new Error("Failed to fetch courses");
         const coursesData: Course[] = await coursesRes.json();
         setCourses(coursesData);
 
         // Fetch engagement for this student
-        const engagementRes = await fetch(`http://localhost:5000/api/engagement`);
+        const engagementRes = await fetch(`http://31.97.49.20/api/engagement`);
         if (!engagementRes.ok) throw new Error("Failed to fetch engagement");
         const engagementData: Engagement[] = await engagementRes.json();
         setEngagement(engagementData);

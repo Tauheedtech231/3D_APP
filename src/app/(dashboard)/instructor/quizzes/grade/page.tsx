@@ -61,7 +61,7 @@ const GradeQuiz: React.FC = () => {
     if (quizId) {
       const fetchData = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/api/quizzes/${quizId}`);
+          const response = await fetch(`http://31.97.49.20/api/quizzes/${quizId}`);
           if (response.ok) {
             const data = await response.json();
             setQuiz(data);
@@ -75,7 +75,7 @@ const GradeQuiz: React.FC = () => {
 
       const fetchQuizAttempts = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/api/quizzes/${quizId}/attempts`);
+          const response = await fetch(`http://31.97.49.20/api/quizzes/${quizId}/attempts`);
           if (response.ok) {
             const data = await response.json();
             setAttempts(data);

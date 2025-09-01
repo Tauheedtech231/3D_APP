@@ -35,7 +35,7 @@ export default function QuizResultPage() {
   useEffect(() => {
     const fetchQuizResult = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/quizzes/${quizId}/results`);
+      const response = await fetch(`http://31.97.49.20/api/quizzes/${quizId}/results`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       setResult(data);

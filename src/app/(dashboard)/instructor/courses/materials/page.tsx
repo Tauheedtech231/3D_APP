@@ -28,7 +28,7 @@ export default function NewMaterialPage() {
   const [file, setFile] = useState<File | null>(null);
   const [fileUrl, setFileUrl] = useState("");
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://31.97.49.20/api";
 
   useEffect(() => {
     const fetchData = async () => {
