@@ -25,7 +25,7 @@ export async function confirmPayment(studentName: string, studentEmail: string, 
 
   // 2. Email to admin
   await sendEmail(
-    'tauheeddeveloper13@gmail.com',
+    'mansol.largify@gmail.com',
     "New Course Purchase - MANSOL LMS",
     `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #1e40af;">New Course Purchase</h2>

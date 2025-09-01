@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { Menu as MenuIcon, X, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import Link from "next/link";
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -27,40 +29,16 @@ const Navbar = () => {
   };
 
   const handleAuthAction = (action: "login" | "register") => {
-    if (action === "login") {
-      router.push("/auth/sign-in");
-    } else {
-      router.push("/auth/sign-up");
-    }
+    router.push(action === "login" ? "/auth/sign-in" : "/auth/sign-up");
   };
 
   const links = [
     { name: "Home", href: "/" },
     {
       name: "Courses",
-      subLinks: [
-        { name: "Course Catalog", href: "/courses" },
-        { name: "BOSH – Basic Occupational Safety & Health", href: "/courses/bosh" },
-        { name: "IOSH – Institution of Occupational Safety & Health", href: "/courses/iosh" },
-        { name: "OSHA – Occupational Safety & Health Administration", href: "/courses/osha" },
-        { name: "PTW – Permit to Work", href: "/courses/ptw" },
-        { name: "Fire Safety – FA Training", href: "/courses/fire-safety" },
-        { name: "First Aid – FS Training", href: "/courses/first-aid" },
-        { name: "Hole Watcher – HW Training", href: "/courses/hole-watcher" },
-      ],
-    },
-    {
-      name: "Instructors",
-      subLinks: [
-        { name: "All Instructors", href: "/instructors" },
-        { name: "Instructor Profiles", href: "/instructors/profiles" },
-        { name: "Become an Instructor", href: "/instructors/become" },
-        { name: "Teaching Resources", href: "/instructors/resources" },
-      ],
+      subLinks: [{ name: "Course Catalog", href: "/course_for_sell" }],
     },
   ];
-
-  const linkFontClass = pathname === "/" ? "text-base" : "text-sm";
 
   if (!mounted) return null;
 
@@ -71,6 +49,7 @@ const Navbar = () => {
       } shadow-md`}
     >
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        {/* Logo */}
         <div
           className={`flex items-center gap-2 p-2 rounded-full ${
             theme === "dark"
@@ -87,7 +66,8 @@ const Navbar = () => {
           />
         </div>
 
-        <ul className={`hidden md:flex items-center gap-6 font-medium ${linkFontClass}`}>
+        {/* Desktop Links */}
+        <ul className="hidden md:flex items-center gap-6 font-medium text-sm">
           {links.map((link) =>
             link.subLinks ? (
               <li key={link.name} className="relative group">
@@ -131,6 +111,7 @@ const Navbar = () => {
           )}
         </ul>
 
+        {/* Desktop Auth + Theme */}
         <div className="hidden md:flex items-center gap-3">
           <Button
             variant="outline"
@@ -166,11 +147,7 @@ const Navbar = () => {
               </Button>
               <Button
                 onClick={() => handleAuthAction("register")}
-                className={`rounded-full px-4 py-1 ${
-                  theme === "dark"
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                }`}
+                className="rounded-full px-4 py-1 bg-blue-600 text-white hover:bg-blue-700"
               >
                 Register
               </Button>
@@ -178,6 +155,7 @@ const Navbar = () => {
           )}
         </div>
 
+        {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -188,6 +166,7 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden bg-white dark:bg-gray-900 shadow-lg border-t border-gray-200 dark:border-gray-700 p-4">
           <ul className="space-y-4">
@@ -220,15 +199,11 @@ const Navbar = () => {
               )
             )}
           </ul>
-          
+
           <div className="mt-4 space-y-2">
             {user ? (
               <>
-                <Button
-                  variant="outline"
-                  onClick={handleLogout}
-                  className="w-full rounded-full"
-                >
+                <Button variant="outline" onClick={handleLogout} className="w-full rounded-full">
                   Logout
                 </Button>
                 <span className="block text-sm font-medium text-center">{user.name}</span>
@@ -244,7 +219,7 @@ const Navbar = () => {
                 </Button>
                 <Button
                   onClick={() => handleAuthAction("register")}
-                  className="w-full rounded-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   Register
                 </Button>
