@@ -2,10 +2,6 @@
 import React from "react";
 import { 
   FaGraduationCap, 
-  FaFacebookF, 
-  FaTwitter, 
-  FaLinkedinIn, 
-  FaInstagram,
   FaMapMarkerAlt,
   FaPhone,
   FaEnvelope,
@@ -14,20 +10,13 @@ import {
 
 const Footer = () => {
   const courseLinks = [
-    { name: "BOSH – Basic Occupational Safety & Health", href: "#" },
-    { name: "IOSH – Institution of Occupational Safety & Health", href: "#" },
-    { name: "OSHA – Occupational Safety & Health Administration", href: "#" },
-    { name: "PTW – Permit to Work", href: "#" },
-    { name: "Fire Safety – FA Training", href: "#" },
-    { name: "First Aid – FS Training", href: "#" },
-    { name: "Hole Watcher – HW Training", href: "#" },
-  ];
-
-  const socialLinks = [
-    { icon: <FaFacebookF size={14} />, href: "#" },
-    { icon: <FaTwitter size={14} />, href: "#" },
-    { icon: <FaLinkedinIn size={14} />, href: "#" },
-    { icon: <FaInstagram size={14} />, href: "#" },
+    "BOSH – Basic Occupational Safety & Health",
+    "IOSH – Institution of Occupational Safety & Health",
+    "OSHA – Occupational Safety & Health Administration",
+    "PTW – Permit to Work",
+    "Fire Safety – FA Training",
+    "First Aid – FS Training",
+    "Hole Watcher – HW Training",
   ];
 
   return (
@@ -43,18 +32,6 @@ const Footer = () => {
             <p className="text-sm mb-6 leading-relaxed">
               Empowering learners worldwide with high-quality education and innovative learning solutions.
             </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((link, idx) => (
-                <a
-                  key={idx}
-                  href={link.href}
-                  className="bg-gray-800 dark:bg-gray-800 h-10 w-10 rounded-full flex items-center justify-center transition-all hover:bg-yellow-500 hover:text-gray-900"
-                  aria-label={`Follow us on ${link.icon}`}
-                >
-                  {link.icon}
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Courses / Quick Links */}
@@ -63,14 +40,14 @@ const Footer = () => {
               Courses
             </h4>
             <ul className="space-y-3">
-              {courseLinks.map((link, idx) => (
+              {courseLinks.map((name, idx) => (
                 <li key={idx}>
                   <a
-                    href={link.href}
+                    href="/course_for_sell"
                     className="flex items-center text-sm transition-all hover:text-yellow-400 group"
                   >
                     <FaArrowRight className="mr-2 text-yellow-400 text-xs transition-transform group-hover:translate-x-1" />
-                    {link.name}
+                    {name}
                   </a>
                 </li>
               ))}
@@ -92,11 +69,11 @@ const Footer = () => {
               </li>
               <li className="flex items-center">
                 <FaPhone className="text-yellow-400 mr-4 flex-shrink-0" />
-                <span className="text-sm">+1 (555) 123-4567</span>
+                <span className="text-sm">+92 309 6993535</span>
               </li>
               <li className="flex items-center">
                 <FaEnvelope className="text-yellow-400 mr-4 flex-shrink-0" />
-                <span className="text-sm">info@edumentor.com</span>
+                <span className="text-sm">mansol.largify@gmail.com</span>
               </li>
             </ul>
           </div>
