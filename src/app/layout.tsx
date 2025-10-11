@@ -1,51 +1,22 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
-// ShadCN Theme Provider
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "sonner";
-import { Providers } from "./providers";
-
-
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Mansol LMS",
-  description: "Mansol Learning Management System - Manage courses, instructors, and materials efficiently",
+  title: 'Aspire College - Virtual Campus Tour',
+  description: 'Explore Aspire College in an immersive 3D virtual environment',
 };
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-     <>
-      <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
-        <head />
-        <body>
-          <Providers>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster />
-            </ThemeProvider>
-          </Providers>
-        </body>
-      </html>
-    </>
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
   );
 }
