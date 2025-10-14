@@ -45,36 +45,6 @@ const collegeEvents: CollegeEvent[] = [
     location: "Sports Complex",
     category: "Sports"
   },
-  {
-    id: 4,
-    title: "Career Fair & Industry Connect 👔",
-    description: "Connect with top companies and explore internship opportunities. Bring your resumes and make valuable industry connections.",
-    image: "https://images.unsplash.com/photo-1551830417-bc5a0f7f0f4a?auto=format&fit=crop&w=800&q=80",
-    date: "Dec 2, 2024",
-    time: "10:00 AM - 4:00 PM",
-    location: "Convention Center",
-    category: "Career"
-  },
-  {
-    id: 5,
-    title: "Science Exhibition 🔬",
-    description: "Explore innovative projects and research by our science students. Interactive demonstrations and live experiments await!",
-    image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80",
-    date: "Dec 8, 2024",
-    time: "11:00 AM - 3:00 PM",
-    location: "Science Block",
-    category: "Academic"
-  },
-  {
-    id: 6,
-    title: "Music Festival 🎵",
-    description: "Rock the night with live bands, solo performances, and DJ sets. Featuring both professional and student artists.",
-    image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80",
-    date: "Dec 12, 2024",
-    time: "7:00 PM - 11:00 PM",
-    location: "Amphitheater",
-    category: "Music"
-  },
 ];
 
 export default function EventsSlider() {
@@ -116,7 +86,7 @@ export default function EventsSlider() {
   const currentEvent = collegeEvents[currentIndex];
 
   return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900/20 overflow-hidden">
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900/20 overflow-hidden relative z-10"> {/* Added relative z-10 */}
       {/* Header with Indigo to Pink Gradient */}
       <motion.div 
         className="text-center mb-12"
@@ -279,9 +249,9 @@ export default function EventsSlider() {
         </div>
       </div>
 
-      {/* Background Decorations */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-indigo-200/20 dark:bg-indigo-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-200/20 dark:bg-pink-500/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
+      {/* Background Decorations - FIXED: No fixed positioning */}
+      <div className="absolute top-0 left-0 w-72 h-72 bg-indigo-200/20 dark:bg-indigo-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-200/20 dark:bg-pink-500/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
     </section>
   );
 }

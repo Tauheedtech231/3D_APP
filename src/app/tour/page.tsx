@@ -91,48 +91,12 @@ export default function Page() {
     }
   }, []);
 
-  const toggleVideoZoom = () => {
-    if (!videoRef.current || !videoContainerRef.current) return;
-
-    if (!isZoomed) {
-      gsap.to(videoContainerRef.current, {
-        scale: isMobile ? 1.3 : 1.8,
-        duration: 1.5,
-        ease: 'power2.inOut',
-      });
-      gsap.to(textRef.current, {
-        opacity: 0,
-        duration: 0.5,
-        ease: 'power2.out',
-      });
-    } else {
-      gsap.to(videoContainerRef.current, {
-        scale: 1,
-        duration: 1.5,
-        ease: 'power2.inOut',
-      });
-      gsap.to(textRef.current, {
-        opacity: 1,
-        duration: 0.5,
-        ease: 'power2.out',
-        delay: 0.5,
-      });
-    }
-    
-    setIsZoomed(!isZoomed);
-  };
-
   const openSection = (sectionId: string) => {
     setActiveSection(sectionId);
     setShowMenu(false);
     setTimeout(() => {
       window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
     }, 100);
-  };
-
-  const closeSection = () => {
-    setActiveSection(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const toggleMenu = () => {
@@ -189,88 +153,87 @@ export default function Page() {
         </div>
       </motion.nav>
 
-      {/* Hero Section - Cleaned Up */}
-    <section className="relative h-screen w-full overflow-hidden">
-  {/* Background Video */}
-  <div className="absolute inset-0 -z-10">
-    <video
-      className="h-full w-full object-cover"
-      src="/videos/Main.mp4"
-      autoPlay
-      loop
-      muted
-      playsInline
-    />
-    <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-transparent to-black/40" />
-  </div>
-
-  {/* Hero Content */}
-  <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 pt-16">
-    <motion.div 
-      className="w-full max-w-4xl mx-auto"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-    >
-      <motion.h1 
-        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white drop-shadow-2xl mb-4 sm:mb-6"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.2 }}
-      >
-        Welcome to{' '}
-        <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent block mt-2">
-          Aspire College
-        </span>
-      </motion.h1>
-
-      <motion.p 
-        className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl text-gray-200 leading-relaxed max-w-3xl mx-auto"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.4 }}
-      >
-        Premier Education. Exceptional Facilities. Unlimited Opportunities.
-        <span className="block mt-2 sm:mt-4 text-indigo-200 font-semibold text-base sm:text-lg">
-          Experience our campus through immersive virtual tours
-        </span>
-      </motion.p>
-    </motion.div>
-
-    {/* Scroll Indicator */}
-    <motion.div 
-      className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1.5 }}
-    >
-      <motion.div
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="flex flex-col items-center text-white/80"
-      >
-        <span className="text-sm mb-2 font-medium">Scroll to Explore</span>
-        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-          <motion.div 
-            className="w-1 h-3 bg-white rounded-full mt-2"
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+      {/* Hero Section */}
+      <section className="relative h-screen w-full overflow-hidden">
+        {/* Background Video */}
+        <div className="absolute inset-0 -z-10">
+          <video
+            className="h-full w-full object-cover"
+            src="/videos/Main.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
           />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-transparent to-black/40" />
         </div>
-      </motion.div>
-    </motion.div>
-  </div>
-</section>
 
+        {/* Hero Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 pt-16">
+          <motion.div 
+            className="w-full max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.h1 
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white drop-shadow-2xl mb-4 sm:mb-6"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+            >
+              Welcome to{' '}
+              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent block mt-2">
+                Aspire College
+              </span>
+            </motion.h1>
 
-      {/* Facilities Menu Modal */}
+            <motion.p 
+              className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl text-gray-200 leading-relaxed max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.4 }}
+            >
+              Premier Education. Exceptional Facilities. Unlimited Opportunities.
+              <span className="block mt-2 sm:mt-4 text-indigo-200 font-semibold text-base sm:text-lg">
+                Experience our campus through immersive virtual tours
+              </span>
+            </motion.p>
+          </motion.div>
+
+          {/* Scroll Indicator */}
+          <motion.div 
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+          >
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="flex flex-col items-center text-white/80"
+            >
+              <span className="text-sm mb-2 font-medium">Scroll to Explore</span>
+              <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+                <motion.div 
+                  className="w-1 h-3 bg-white rounded-full mt-2"
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Facilities Menu Modal - Z-INDEX FIXED */}
       <AnimatePresence>
         {showMenu && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4" // Increased z-index
           >
             <motion.div
               initial={{ opacity: 0 }}
@@ -285,14 +248,14 @@ export default function Page() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 50 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative bg-white dark:bg-gray-900 max-w-4xl w-full rounded-3xl shadow-2xl overflow-hidden z-10 max-h-[90vh] overflow-y-auto"
+              className="relative bg-white dark:bg-gray-900 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden z-[101]" // Increased z-index
             >
-              <div className="p-8">
-                <div className="flex items-center justify-between mb-8">
+              <div className="p-6 md:p-8">
+                <div className="flex items-center justify-between mb-6 md:mb-8">
                   <motion.h2 
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="text-3xl font-bold text-gray-900 dark:text-white"
+                    className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white"
                   >
                     Campus <span className="bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">Facilities</span>
                   </motion.h2>
@@ -308,7 +271,8 @@ export default function Page() {
                   </motion.button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Grid Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                   {sections.map((section, index) => (
                     <motion.div
                       key={section.id}
@@ -316,14 +280,14 @@ export default function Page() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 + index * 0.1 }}
                       whileHover={{ 
-                        scale: isMobile ? 1 : 1.05,
+                        scale: isMobile ? 1.02 : 1.05,
                         y: isMobile ? 0 : -5,
                       }}
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => openSection(section.id)}
                       className="group cursor-pointer"
                     >
-                      <div className={`${section.gradient} rounded-2xl p-6 text-white text-center shadow-lg group-hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between min-h-[200px]`}>
+                      <div className={`${section.gradient} rounded-2xl p-6 text-white text-center shadow-lg group-hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between min-h-[180px] md:min-h-[200px]`}>
                         <div>
                           <motion.div 
                             className="text-4xl mb-4 transform group-hover:scale-110 transition-transform duration-300"
@@ -352,9 +316,9 @@ export default function Page() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
-                  className="mt-8 text-center"
+                  className="mt-6 md:mt-8 text-center"
                 >
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
                     Select a facility to explore in detail
                   </p>
                 </motion.div>
@@ -364,14 +328,14 @@ export default function Page() {
         )}
       </AnimatePresence>
 
-      {/* Active Section Display - Clean Header */}
+      {/* Active Section Display */}
       <AnimatePresence>
         {activeSection && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="min-h-screen bg-gray-50 dark:bg-gray-900"
+            className="min-h-screen bg-gray-50 dark:bg-gray-900 relative z-10" // Added z-10
           >
             {/* Simple Section Header */}
             <div className="sticky top-0 z-40 bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
@@ -396,43 +360,48 @@ export default function Page() {
           </motion.div>
         )}
       </AnimatePresence>
-      <CafeteriaBlog />
 
-      {/* Professional Footer - Always Visible */}
-<footer className="bg-gray-900 text-white py-8">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-    
-    {/* College Name with Gradient */}
-    <div className="text-center sm:text-left">
-      <span className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-pink-500">
-        Aspire College
-      </span>
-    </div>
+      {/* CafeteriaBlog with proper z-index */}
+       {/* Added wrapper with z-index */}
+       
+<div className="relative z-10"> {/* Lower z-index than nav */}
+  <CafeteriaBlog />
+</div>
+      
 
-    {/* Contact Info */}
-    <div className="flex flex-col sm:flex-row items-center gap-4 text-sm">
-      <a 
-        href="tel:+15551234567" 
-        className="flex items-center gap-2 hover:text-indigo-400 transition-colors duration-300"
-      >
-        📞 +1 (555) 123-4567
-      </a>
-      <a 
-        href="mailto:info@aspirecollege.edu" 
-        className="flex items-center gap-2 hover:text-pink-400 transition-colors duration-300"
-      >
-        ✉️ info@aspirecollege.edu
-      </a>
-    </div>
+      {/* Professional Footer */}
+      <footer className="bg-gray-900 text-white py-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          
+          {/* College Name with Gradient */}
+          <div className="text-center sm:text-left">
+            <span className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-pink-500">
+              Aspire College
+            </span>
+          </div>
 
-    {/* Year */}
-    <div className="text-sm text-gray-400 text-center sm:text-right">
-      © {new Date().getFullYear()} Aspire College
-    </div>
-  </div>
-</footer>
+          {/* Contact Info */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 text-sm">
+            <a 
+              href="tel:+15551234567" 
+              className="flex items-center gap-2 hover:text-indigo-400 transition-colors duration-300"
+            >
+              📞 +1 (555) 123-4567
+            </a>
+            <a 
+              href="mailto:info@aspirecollege.edu" 
+              className="flex items-center gap-2 hover:text-pink-400 transition-colors duration-300"
+            >
+              ✉️ info@aspirecollege.edu
+            </a>
+          </div>
 
-
+          {/* Year */}
+          <div className="text-sm text-gray-400 text-center sm:text-right">
+            © {new Date().getFullYear()} Aspire College
+          </div>
+        </div>
+      </footer>
     </>
   );
 }
