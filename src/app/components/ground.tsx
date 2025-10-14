@@ -27,18 +27,76 @@ function GroundPlane({ textureUrl = '/images/sports_ground.jpg', planeWidth = 12
   texture.anisotropy = 16;
 
   const meshRef = useRef<THREE.Mesh>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  
   useFrame((state) => {
-    if (!meshRef.current) return;
-    const t = state.clock.elapsedTime * 0.15;
-    meshRef.current.rotation.z = Math.sin(t) * 0.006;
+    if (!meshRef.current || !materialRef.current) return;
+    const t = state.clock.elapsedTime;
+    
+    // Floating animation
+    meshRef.current.rotation.z = Math.sin(t * 0.3) * 0.006;
     meshRef.current.position.y = Math.sin(t * 0.8) * 0.03;
+    
+    // Enhanced hover effects
+    if (isHovered) {
+      meshRef.current.rotation.x = -0.18 + Math.sin(t * 0.8) * 0.02;
+      meshRef.current.rotation.y = Math.sin(t * 0.4) * 0.03;
+      materialRef.current.emissiveIntensity = 0.1;
+    } else {
+      meshRef.current.rotation.x = -0.2;
+      meshRef.current.rotation.y = 0;
+      materialRef.current.emissiveIntensity = 0.02;
+    }
   });
 
   return (
-    <mesh ref={meshRef} rotation={[-0.2, 0, 0]} position={[0, -0.2, 0]}>
+    <mesh 
+      ref={meshRef} 
+      rotation={[-0.2, 0, 0]} 
+      position={[0, -0.2, 0]}
+      onPointerEnter={() => setIsHovered(true)}
+      onPointerLeave={() => setIsHovered(false)}
+    >
       <planeGeometry args={[planeWidth, planeHeight]} />
-      <meshStandardMaterial map={texture} roughness={0.6} metalness={0.2} />
+      <meshStandardMaterial 
+        ref={materialRef}
+        map={texture} 
+        roughness={0.6} 
+        metalness={0.2}
+        emissive="#ffffff"
+        emissiveIntensity={0.02}
+      />
     </mesh>
+  );
+}
+
+function EnhancedOrbitControls() {
+    /* eslint-disable */
+
+  const controlsRef = useRef<any>(null);
+  
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.enableRotate = true;
+      controlsRef.current.enableZoom = true;
+      controlsRef.current.enablePan = true;
+      controlsRef.current.rotateSpeed = 0.4;
+      controlsRef.current.zoomSpeed = 0.8;
+      controlsRef.current.panSpeed = 0.5;
+      controlsRef.current.minDistance = 4;
+      controlsRef.current.maxDistance = 20;
+      controlsRef.current.minPolarAngle = 0;
+      controlsRef.current.maxPolarAngle = Math.PI;
+    }
+  }, []);
+
+  return (
+    <OrbitControls
+      ref={controlsRef}
+      enableDamping
+      dampingFactor={0.07}
+    />
   );
 }
 
@@ -68,6 +126,16 @@ function SpotMarker({
   );
 }
 
+function SceneLights() {
+  return (
+    <>
+      <ambientLight intensity={0.8} />
+      <directionalLight position={[10, 10, 5]} intensity={0.9} />
+      <directionalLight position={[-10, 5, -5]} intensity={0.3} />
+    </>
+  );
+}
+
 function AutoPlayVideo({ src }: { src: string }) {
   const ref = useRef<HTMLVideoElement | null>(null);
 
@@ -90,20 +158,9 @@ function AutoPlayVideo({ src }: { src: string }) {
   return <video ref={ref} src={src} className="w-full h-full object-cover" muted controls playsInline preload="metadata" />;
 }
 
-function CameraAnimation() {
-  const { camera } = useThree();
-  const tRef = useRef(0);
-  useFrame((_, delta) => {
-    tRef.current += delta * 0.05;
-    camera.position.x = Math.sin(tRef.current) * 3;
-    camera.position.z = 8 + Math.cos(tRef.current) * 2;
-    camera.lookAt(0, 0, 0);
-  });
-  return null;
-}
-
 export default function GroundSection() {
   const [active, setActive] = useState<Spot | null>(null);
+  const [isHoveringCanvas, setIsHoveringCanvas] = useState(false);
   const planeWidth = 12;
   const planeHeight = 7;
 
@@ -123,10 +180,24 @@ export default function GroundSection() {
         {/* Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left: 3D Ground Map */}
-          <div className="w-full h-[360px] sm:h-[420px] md:h-[500px] rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-700">
-            <Canvas camera={{ position: [0, 3.6, 9], fov: 45 }} dpr={[1, 2]}>
-              <ambientLight intensity={0.8} />
-              <directionalLight position={[10, 10, 5]} intensity={0.9} />
+          <div 
+            className="w-full h-[360px] sm:h-[420px] md:h-[500px] rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-700 relative"
+            onMouseEnter={() => setIsHoveringCanvas(true)}
+            onMouseLeave={() => setIsHoveringCanvas(false)}
+          >
+            {/* Hover Instructions */}
+            <div className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full transition-all duration-300 ${
+              isHoveringCanvas ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`}>
+              🖱️ Scroll to zoom • Drag to rotate
+            </div>
+
+            <Canvas 
+              camera={{ position: [0, 3.6, 9], fov: 45 }} 
+              dpr={[1, 2]}
+              className="cursor-grab active:cursor-grabbing"
+            >
+              <SceneLights />
               <Environment
                 files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/venice_sunset_1k.hdr"
                 background
@@ -145,8 +216,7 @@ export default function GroundSection() {
                   />
                 ))}
               </Suspense>
-              <OrbitControls enablePan enableZoom enableRotate={false} minDistance={4} maxDistance={20} enableDamping dampingFactor={0.07} />
-              <CameraAnimation />
+              <EnhancedOrbitControls />
             </Canvas>
           </div>
 

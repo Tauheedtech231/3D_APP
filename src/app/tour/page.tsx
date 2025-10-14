@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LibrarySection from '../components/LibrarySection';
 import GroundSection from '../components/ground';
 import LabsSection from '../components/labs';
+import CafeteriaBlog from '../components/cafetria';
 
 type Section = {
   id: string;
@@ -395,6 +396,7 @@ export default function Page() {
           </motion.div>
         )}
       </AnimatePresence>
+      <CafeteriaBlog />
 
       {/* Professional Footer - Always Visible */}
 <footer className="bg-gray-900 text-white py-8">

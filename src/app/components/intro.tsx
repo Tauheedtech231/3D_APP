@@ -29,7 +29,13 @@ function FloatingBlock({ position, color, speed, size }: FloatingBlockProps) {
   return (
     <mesh ref={meshRef} position={position} castShadow receiveShadow>
       <boxGeometry args={[size, size, size]} />
-      <meshStandardMaterial color={color} metalness={0.5} roughness={0.4} />
+      <meshStandardMaterial
+        color={color}
+        emissive={color}
+        emissiveIntensity={0.3}
+        metalness={0.5}
+        roughness={0.4}
+      />
     </mesh>
   );
 }
@@ -44,21 +50,15 @@ function FloatingBlocksField() {
           (Math.random() - 0.5) * 10,
           (Math.random() - 0.5) * 20,
         ],
-        color: `hsl(${Math.random() * 360}, 60%, 60%)`,
+        color: `hsl(${Math.random() * 360}, 70%, 60%)`,
         speed: 0.5 + Math.random(),
-        size: 0.4 + Math.random() * 1.2,
+        size: 0.5 + Math.random() * 1.5,
       });
     }
     return arr;
   }, []);
 
-  return (
-    <>
-      {blocks.map((b, i) => (
-        <FloatingBlock key={i} {...b} />
-      ))}
-    </>
-  );
+  return <>{blocks.map((b, i) => <FloatingBlock key={i} {...b} />)}</>;
 }
 
 export default function Intro() {
@@ -92,8 +92,8 @@ export default function Intro() {
     <div className="relative h-screen w-full overflow-hidden bg-black text-white">
       {/* === 3D Background === */}
       <div className="absolute inset-0 -z-10">
-        <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
-          <ambientLight intensity={0.6} />
+        <Canvas camera={{ position: [0, 0, 12], fov: 55 }}>
+          <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={1} />
           <FloatingBlocksField />
           <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.6} />
@@ -102,32 +102,45 @@ export default function Intro() {
 
       {/* === Foreground Content === */}
       <main className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-xl animate-fadeIn">
           Welcome to Your{' '}
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-pink-400">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-pink-400 animate-textGlow">
             Virtual Campus
           </span>
         </h1>
-        <p className="mt-4 text-gray-300 max-w-2xl">
-          Experience your university like never before — walk through classrooms, explore labs, and
-          feel the real vibe of your campus in 3D.
+        <p className="mt-4 text-gray-300 max-w-2xl animate-fadeIn delay-200">
+          Explore classrooms, labs, and every corner of your campus in stunning 3D.
         </p>
 
         <button
           ref={btnRef}
           onClick={startTour}
-          className="mt-8 px-6 py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-2xl shadow-2xl hover:scale-105 transition-transform font-semibold flex items-center gap-2"
+          className="mt-8 px-8 py-3 bg-gradient-to-r from-indigo-600 to-pink-600 rounded-3xl shadow-2xl hover:scale-105 hover:shadow-pink-500/50 transition-transform font-semibold flex items-center gap-2 text-white"
         >
-          <svg
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M5 3v18l15-9L5 3z" />
           </svg>
           Start Virtual Tour
         </button>
       </main>
+
+      {/* === Animations === */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 1s forwards;
+        }
+        @keyframes textGlow {
+          0%, 100% { text-shadow: 0 0 8px #fff, 0 0 20px #f0f; }
+          50% { text-shadow: 0 0 12px #fff, 0 0 30px #0ff; }
+        }
+        .animate-textGlow {
+          animation: textGlow 3s infinite alternate;
+        }
+      `}</style>
     </div>
   );
 }
