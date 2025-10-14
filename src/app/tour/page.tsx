@@ -364,9 +364,9 @@ export default function Page() {
       {/* CafeteriaBlog with proper z-index */}
        {/* Added wrapper with z-index */}
        
-<div className="relative z-10"> {/* Lower z-index than nav */}
+{/* Lower z-index than nav */}
   <CafeteriaBlog />
-</div>
+
       
 
       {/* Professional Footer */}

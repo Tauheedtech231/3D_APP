@@ -4,12 +4,23 @@ import React, { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useTexture, Float } from '@react-three/drei';
 import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
 import * as THREE from 'three';
 
-function InteractiveLibraryImage({ textureUrl = '/images/library.jpg', planeWidth = 10, planeHeight = 6 }) {
+// Online library images from Unsplash
+const LIBRARY_IMAGES = [
+  "https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
+  "https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
+  "https://images.unsplash.com/photo-1568667256549-094345857637?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
+  "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80"
+];
+
+function MultiViewLibraryImage({ textureUrl = '/images/library.jpg', planeWidth = 10, planeHeight = 6 }) {
   const texture = useTexture(textureUrl);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 16;
+  /* eslint-disable */
+
 
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
@@ -59,8 +70,6 @@ function InteractiveLibraryImage({ textureUrl = '/images/library.jpg', planeWidt
 }
 
 function EnhancedOrbitControls() {
-    /* eslint-disable */
-
   const controlsRef = useRef<any>(null);
   
   useEffect(() => {
@@ -207,6 +216,31 @@ const CARD_BACKGROUND_IMAGE = "https://images.unsplash.com/photo-1589998059171-9
 
 export default function LibrarySection() {
   const [isHoveringCanvas, setIsHoveringCanvas] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % LIBRARY_IMAGES.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + LIBRARY_IMAGES.length) % LIBRARY_IMAGES.length);
+  };
+
+  // Auto-rotate images every 8 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextImage();
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const imageTitles = [
+    "Main Reading Hall",
+    "Study Zone & Computers", 
+    "Book Collections",
+    "Digital Resources"
+  ];
 
   return (
     <section className="relative py-16 bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-[#0a1426] dark:via-[#071025] dark:to-[#0f172a] transition-colors duration-500">
@@ -224,53 +258,106 @@ export default function LibrarySection() {
               Library
             </span>
           </h2>
-      
-
         </motion.div>
 
         {/* Layout */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-          {/* 3D Canvas Section */}
-          <motion.div 
-            className="w-full lg:w-1/2 h-[400px] sm:h-[500px] md:h-[600px] rounded-3xl overflow-hidden shadow-2xl border border-white/20 dark:border-slate-700/50 relative group"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            onMouseEnter={() => setIsHoveringCanvas(true)}
-            onMouseLeave={() => setIsHoveringCanvas(false)}
-          >
-            {/* Interactive Hover Overlay */}
-            <div className={`absolute inset-0 pointer-events-none z-10 transition-all duration-300 ${
-              isHoveringCanvas 
-                ? 'bg-gradient-to-t from-black/10 to-transparent' 
-                : 'bg-gradient-to-t from-black/5 to-transparent'
-            }`} />
-            
-            {/* Hover Instructions */}
-            <div className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white text-xs sm:text-sm px-3 py-1 rounded-full transition-all duration-300 ${
-              isHoveringCanvas ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-            }`}>
-              🖱️ Scroll to zoom • Drag to rotate • Right-click to pan
-            </div>
-
-            <Canvas 
-              camera={{ position: [0, 2, 8], fov: 50 }} 
-              dpr={[1, 2]}
-              className="cursor-grab active:cursor-grabbing"
+          {/* Left: 3D Canvas Section */}
+          <div className="w-full lg:w-1/2">
+            <motion.div 
+              className="h-[400px] sm:h-[500px] md:h-[600px] rounded-3xl overflow-hidden shadow-2xl border border-white/20 dark:border-slate-700/50 relative group"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              onMouseEnter={() => setIsHoveringCanvas(true)}
+              onMouseLeave={() => setIsHoveringCanvas(false)}
             >
-              <SceneLights />
-              <Suspense fallback={null}>
-                <InteractiveLibraryImage 
-                  textureUrl="/images/library.jpg" 
-                  planeWidth={10} 
-                  planeHeight={6} 
-                />
-                <FloatingParticles />
-              </Suspense>
-              <EnhancedOrbitControls />
-              <CameraController />
-            </Canvas>
-          </motion.div>
+              {/* Interactive Hover Overlay */}
+              <div className={`absolute inset-0 pointer-events-none z-10 transition-all duration-300 ${
+                isHoveringCanvas 
+                  ? 'bg-gradient-to-t from-black/10 to-transparent' 
+                  : 'bg-gradient-to-t from-black/5 to-transparent'
+              }`} />
+              
+              {/* Hover Instructions */}
+              <div className={`absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white text-xs sm:text-sm px-3 py-1 rounded-full transition-all duration-300 ${
+                isHoveringCanvas ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`}>
+                🖱️ Scroll to zoom • Drag to rotate • Right-click to pan
+              </div>
+
+              {/* Image Navigation */}
+              <div className="absolute top-4 left-4 z-20">
+                <div className="bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 text-white text-sm font-medium">
+                  {currentImageIndex + 1} / {LIBRARY_IMAGES.length}
+                </div>
+              </div>
+
+              {/* Navigation Arrows */}
+              <button
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+                aria-label="Previous image"
+              >
+                <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <button
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+                aria-label="Next image"
+              >
+                <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <Canvas 
+                camera={{ position: [0, 2, 8], fov: 50 }} 
+                dpr={[1, 2]}
+                className="cursor-grab active:cursor-grabbing"
+              >
+                <SceneLights />
+                <Suspense fallback={null}>
+                  <MultiViewLibraryImage 
+                    textureUrl={LIBRARY_IMAGES[currentImageIndex]} 
+                    planeWidth={10} 
+                    planeHeight={6} 
+                  />
+                  <FloatingParticles />
+                </Suspense>
+                <EnhancedOrbitControls />
+                <CameraController />
+              </Canvas>
+            </motion.div>
+
+            {/* Image Title */}
+            <motion.div
+              key={currentImageIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mt-4"
+            >
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
+                {imageTitles[currentImageIndex]}
+              </h3>
+              <div className="flex justify-center space-x-2 mt-2">
+                {LIBRARY_IMAGES.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentImageIndex
+                        ? 'bg-blue-600 scale-125'
+                        : 'bg-slate-300 dark:bg-slate-600 hover:bg-slate-400'
+                    }`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
 
           {/* Right Content Section */}
           <div className="flex flex-col w-full lg:w-1/2 gap-6">
